@@ -1,0 +1,7 @@
+* {
+  touch-action: manipulation;
+}
+
+.file-hidden {
+  display: none;
+}
