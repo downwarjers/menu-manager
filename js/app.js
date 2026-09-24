@@ -485,6 +485,26 @@ createApp({
 
     const saveChannelConfig = () => {
       channels.value = JSON.parse(JSON.stringify(tempChannels.value));
+      // 同步重新計算所有料理與套餐的通路價格
+      dishes.value.forEach((dish) => {
+        const base = dish.prices?.['dine_in'] || 0;
+        channels.value.forEach((ch) => {
+          if (ch.key !== 'dine_in') {
+            const rate = 1 + ch.markupPercent / 100;
+            dish.prices[ch.key] = applyCustomRounding(base * rate, ch.roundMode);
+          }
+        });
+      });
+
+      packages.value.forEach((pkg) => {
+        const base = pkg.prices?.['dine_in'] || 0;
+        channels.value.forEach((ch) => {
+          if (ch.key !== 'dine_in') {
+            const rate = 1 + ch.markupPercent / 100;
+            pkg.prices[ch.key] = applyCustomRounding(base * rate, ch.roundMode);
+          }
+        });
+      });
       closeModal();
     };
 
