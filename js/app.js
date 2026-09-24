@@ -33,6 +33,7 @@ createApp({
     const dishFilterActive = ref('');
     const dishSort = ref('default');
     const pkgSearch = ref('');
+    const pkgSort = ref('default');
 
     const ingredientForm = ref({
       index: null,
@@ -210,9 +211,25 @@ createApp({
     });
 
     const filteredPackages = computed(() => {
-      return packages.value.filter((p) => {
+      let list = packages.value.filter((p) => {
         return p.name.toLowerCase().includes(pkgSearch.value.toLowerCase());
       });
+      if (pkgSort.value === 'name') {
+        list.sort((a, b) => {
+          return a.name.localeCompare(b.name, 'zh-Hant');
+        });
+      }
+      if (pkgSort.value === 'priceAsc') {
+        list.sort((a, b) => {
+          return (a.prices?.dine_in || 0) - (b.prices?.dine_in || 0);
+        });
+      }
+      if (pkgSort.value === 'priceDesc') {
+        list.sort((a, b) => {
+          return (b.prices?.dine_in || 0) - (a.prices?.dine_in || 0);
+        });
+      }
+      return list;
     });
 
     const getMatchedDishes = (slot) => {
@@ -929,6 +946,7 @@ createApp({
       dishFilterActive,
       dishSort,
       pkgSearch,
+      pkgSort,
       dishForm,
       pkgForm,
       ingredientForm,

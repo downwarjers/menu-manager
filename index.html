@@ -61,22 +61,6 @@
         </div>
       </header>
 
-      <!-- 頂部主要業務大按鈕 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-        <button
-          @click="openModal('dish')"
-          class="bg-amber-600 active:bg-amber-700 text-white p-4 rounded-2xl shadow font-bold text-lg flex items-center justify-center gap-2"
-        >
-          <span class="text-2xl leading-none">+</span> 新增/組合料理
-        </button>
-        <button
-          @click="openModal('package')"
-          class="bg-rose-600 active:bg-rose-700 text-white p-4 rounded-2xl shadow font-bold text-lg flex items-center justify-center gap-2"
-        >
-          <span class="text-2xl leading-none">+</span> 組合多選套餐
-        </button>
-      </div>
-
       <!-- 標籤導航 -->
       <div
         class="flex border-b border-gray-300 mb-4 text-center text-base sm:text-lg font-bold bg-white rounded-2xl overflow-hidden shadow-sm"
@@ -231,15 +215,25 @@
 
       <!-- 2. 套餐清單 -->
       <div v-if="currentTab === 'packages'" class="space-y-3.5">
-        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-200">
-          <input
-            v-model="pkgSearch"
-            type="text"
-            placeholder="搜尋套餐名稱..."
-            class="w-full border-2 border-gray-200 rounded-xl px-3.5 py-2.5 text-base outline-none focus:border-rose-500"
-          />
+        <div class="bg-white p-4 rounded-2xl shadow-sm space-y-3 border border-gray-200">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input
+              v-model="pkgSearch"
+              type="text"
+              placeholder="搜尋套餐名稱..."
+              class="flex-1 border-2 border-gray-200 rounded-xl px-3.5 py-2.5 text-base outline-none focus:border-rose-500 min-w-0"
+            />
+            <select
+              v-model="pkgSort"
+              class="border-2 border-gray-200 rounded-xl px-3 py-2.5 text-base bg-white w-full sm:w-auto font-medium"
+            >
+              <option value="default">最新建立</option>
+              <option value="name">依名稱排序</option>
+              <option value="priceAsc">內用價 (低→高)</option>
+              <option value="priceDesc">內用價 (高→低)</option>
+            </select>
+          </div>
         </div>
-
         <div
           v-if="filteredPackages.length === 0"
           class="text-center text-gray-400 py-12 text-base font-medium"
@@ -297,7 +291,7 @@
 
           <div class="text-sm sm:text-base text-gray-700 space-y-2">
             <div
-              v-for="(slot, sIdx) in pkgForm.slots"
+              v-for="(slot, sIdx) in pkg.slots"
               :key="sIdx"
               class="bg-gray-100 px-3 py-2 rounded-xl leading-relaxed"
             >
@@ -648,9 +642,12 @@
         class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center sm:p-4 z-50"
       >
         <div
-          class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg p-5 shadow-2xl max-h-[92vh] overflow-y-auto"
+          class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl max-h-[92vh] flex flex-col overflow-hidden"
         >
-          <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-200">
+          <!-- 固定頂部標題與關閉 -->
+          <div
+            class="flex justify-between items-center p-4 border-b border-gray-200 bg-white shrink-0"
+          >
             <h3 class="text-lg sm:text-xl font-bold text-amber-600">
               {{ dishForm.id ? '修改料理' : '新增料理品項' }}
             </h3>
@@ -662,198 +659,202 @@
             </button>
           </div>
 
-          <div
-            class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-200"
-          >
-            <div class="flex items-center justify-between sm:justify-start gap-2">
-              <span class="text-sm font-bold text-gray-700">商品狀態：</span>
-              <button
-                @click="dishForm.active = !dishForm.active"
-                :class="dishForm.active !== false ? 'bg-emerald-600 text-white' : 'bg-gray-400 text-white'"
-                class="text-sm px-3 py-1.5 rounded-xl font-bold"
-              >
-                {{ dishForm.active !== false ? '✓ 上架供應中' : '✕ 已暫停售賣' }}
-              </button>
-            </div>
-            <div class="flex bg-gray-200 p-1 rounded-xl text-sm font-bold">
-              <button
-                @click="setDishMode('combine')"
-                :class="dishForm.mode === 'combine' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-700'"
-                class="flex-1 py-1.5 px-3 rounded-lg transition-all"
-              >
-                點選組合
-              </button>
-              <button
-                @click="setDishMode('manual')"
-                :class="dishForm.mode === 'manual' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-700'"
-                class="flex-1 py-1.5 px-3 rounded-lg transition-all"
-              >
-                手動輸入
-              </button>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="block text-sm font-bold text-gray-700 mb-1.5">料理類別：</label>
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="c in categories"
-                :key="c"
-                @click="dishForm.category = c"
-                :class="dishForm.category === c ? 'bg-amber-600 text-white font-bold' : 'bg-gray-100 text-gray-800'"
-                class="px-3.5 py-2 rounded-xl text-sm sm:text-base border border-transparent"
-              >
-                {{ c }}
-              </button>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="block text-sm font-bold text-gray-700 mb-1.5">
-              料理名稱 {{ dishForm.mode === 'combine' ? '(點選自動拼裝，可再手動微調)：' :
-              '(手動輸入)：' }}
-            </label>
-            <input
-              v-model="dishForm.name"
-              type="text"
-              placeholder="請點選組合或自行輸入"
-              class="w-full border-2 border-amber-300 rounded-xl p-3 text-base sm:text-lg font-bold outline-none bg-white"
-            />
-          </div>
-
-          <!-- 組合點選區塊 -->
-          <div
-            v-if="dishForm.mode === 'combine'"
-            class="space-y-3 mb-3.5 bg-amber-50/50 p-3 rounded-2xl border border-amber-200"
-          >
-            <!-- 已選組合積木預覽區 -->
-            <div class="bg-white p-2.5 rounded-xl border border-amber-200">
-              <div class="flex justify-between items-center mb-1.5">
-                <span class="text-xs font-bold text-gray-600">已組合元素 (依序排列)：</span>
-                <button
-                  v-if="dishForm.selectedMethod || dishForm.selectedIngredients.length > 0"
-                  @click="clearDishTokens"
-                  class="text-xs text-red-500 font-bold hover:underline"
-                >
-                  全部清除
-                </button>
-              </div>
-              <div class="flex flex-wrap items-center gap-1.5 min-h-[32px]">
-                <span
-                  v-if="!dishForm.selectedMethod && dishForm.selectedIngredients.length === 0"
-                  class="text-xs text-gray-400 py-1"
-                >
-                  尚未選擇任何作法或食材
-                </span>
-                <span
-                  v-if="dishForm.selectedMethod"
-                  class="inline-flex items-center gap-1 bg-indigo-100 text-indigo-900 border border-indigo-300 px-2.5 py-1 rounded-lg text-xs font-bold"
-                >
-                  [作法] {{ dishForm.selectedMethod }}
-                  <button
-                    @click="selectDishMethod('')"
-                    class="text-indigo-500 hover:text-indigo-800 text-sm leading-none"
-                  >
-                    ×
-                  </button>
-                </span>
-                <span
-                  v-for="(ing, idx) in dishForm.selectedIngredients"
-                  :key="idx"
-                  class="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg text-xs font-bold"
-                >
-                  {{ ing }}
-                  <button
-                    @click="removeDishIngredientToken(idx)"
-                    class="text-amber-600 hover:text-amber-900 text-sm leading-none"
-                  >
-                    ×
-                  </button>
-                </span>
-              </div>
-            </div>
-
-            <!-- 1. 作法 -->
-            <div>
-              <div class="flex justify-between items-center mb-1.5">
-                <span class="text-sm font-bold text-gray-800">作法 (選填，單選)：</span>
-              </div>
-              <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1">
-                <button
-                  v-for="m in methods"
-                  :key="m"
-                  @click="selectDishMethod(m)"
-                  :class="dishForm.selectedMethod === m ? 'bg-indigo-600 text-white font-bold' : 'bg-white border text-gray-800'"
-                  class="px-3 py-1.5 rounded-xl text-sm shadow-sm"
-                >
-                  {{ m }}
-                </button>
-              </div>
-            </div>
-
-            <!-- 2. 食材庫 -->
-            <div>
-              <div class="flex justify-between items-center mb-1.5">
-                <span class="text-sm font-bold text-gray-800">食材選擇 (可連續追加)：</span>
-              </div>
-              <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
-                <button
-                  v-for="ing in ingredients"
-                  :key="ing.name"
-                  @click="handleIngredientClick(ing)"
-                  class="bg-white border text-gray-800 px-3 py-2 rounded-xl text-sm sm:text-base font-medium shadow-sm hover:border-amber-400"
-                >
-                  {{ ing.name }}
-                </button>
-              </div>
-
-              <!-- 形態別名選擇列（若點選的食材具備別名） -->
-              <div
-                v-if="activeIngredientAliasGroup"
-                class="flex flex-wrap items-center gap-1.5 mt-2 p-2.5 bg-amber-100/60 rounded-xl border border-amber-300"
-              >
-                <span class="text-xs text-amber-900 font-bold shrink-0">選擇形態：</span>
-                <button
-                  v-for="alias in [activeIngredientAliasGroup.name, ...activeIngredientAliasGroup.aliases]"
-                  :key="alias"
-                  @click="pushIngredientToken(alias)"
-                  class="bg-white text-amber-900 border border-amber-300 px-3 py-1 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-200"
-                >
-                  + {{ alias }}
-                </button>
-                <button
-                  @click="activeIngredientAliasGroup = null"
-                  class="text-xs text-gray-500 underline ml-auto"
-                >
-                  收合
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 通路價格 -->
-          <div class="border-t border-gray-200 pt-3 mb-4">
-            <span class="text-sm font-bold text-gray-700 block mb-2"
-              >各通路價格 (依通路規則自動換算)：</span
+          <!-- 滾動內容本體 -->
+          <div class="p-5 overflow-y-auto space-y-3.5">
+            <div
+              class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-200"
             >
-            <div class="grid grid-cols-2 gap-2.5">
-              <div v-for="ch in channels" :key="ch.key">
-                <label class="text-xs sm:text-sm text-gray-600 block mb-1 font-medium">
-                  {{ ch.name }} {{ ch.markupPercent ? `(+${ch.markupPercent}%)` : '' }}
-                </label>
-                <input
-                  v-model.number="dishForm.prices[ch.key]"
-                  @input="ch.key === 'dine_in' ? applyAutoMarkup('dish') : null"
-                  type="number"
-                  inputmode="numeric"
-                  pattern="[0-9]*"
-                  class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-center text-lg font-bold bg-white outline-none focus:border-amber-500"
-                />
+              <div class="flex items-center justify-between sm:justify-start gap-2">
+                <span class="text-sm font-bold text-gray-700">商品狀態：</span>
+                <button
+                  @click="dishForm.active = !dishForm.active"
+                  :class="dishForm.active !== false ? 'bg-emerald-600 text-white' : 'bg-gray-400 text-white'"
+                  class="text-sm px-3 py-1.5 rounded-xl font-bold"
+                >
+                  {{ dishForm.active !== false ? '✓ 上架供應中' : '✕ 已暫停售賣' }}
+                </button>
+              </div>
+              <div class="flex bg-gray-200 p-1 rounded-xl text-sm font-bold">
+                <button
+                  @click="setDishMode('combine')"
+                  :class="dishForm.mode === 'combine' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-700'"
+                  class="flex-1 py-1.5 px-3 rounded-lg transition-all"
+                >
+                  點選組合
+                </button>
+                <button
+                  @click="setDishMode('manual')"
+                  :class="dishForm.mode === 'manual' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-700'"
+                  class="flex-1 py-1.5 px-3 rounded-lg transition-all"
+                >
+                  手動輸入
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-sm font-bold text-gray-700 mb-1.5">料理類別：</label>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="c in categories"
+                  :key="c"
+                  @click="dishForm.category = c"
+                  :class="dishForm.category === c ? 'bg-amber-600 text-white font-bold' : 'bg-gray-100 text-gray-800'"
+                  class="px-3.5 py-2 rounded-xl text-sm sm:text-base border border-transparent"
+                >
+                  {{ c }}
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="block text-sm font-bold text-gray-700 mb-1.5">
+                料理名稱 {{ dishForm.mode === 'combine' ? '(點選自動拼裝，可再手動微調)：' :
+                '(手動輸入)：' }}
+              </label>
+              <input
+                v-model="dishForm.name"
+                type="text"
+                placeholder="請點選組合或自行輸入"
+                class="w-full border-2 border-amber-300 rounded-xl p-3 text-base sm:text-lg font-bold outline-none bg-white"
+              />
+            </div>
+
+            <!-- 組合點選區塊 -->
+            <div
+              v-if="dishForm.mode === 'combine'"
+              class="space-y-3 mb-3.5 bg-amber-50/50 p-3 rounded-2xl border border-amber-200"
+            >
+              <!-- 已選組合積木預覽區 -->
+              <div class="bg-white p-2.5 rounded-xl border border-amber-200">
+                <div class="flex justify-between items-center mb-1.5">
+                  <span class="text-xs font-bold text-gray-600">已組合元素 (依序排列)：</span>
+                  <button
+                    v-if="dishForm.selectedMethod || dishForm.selectedIngredients.length > 0"
+                    @click="clearDishTokens"
+                    class="text-xs text-red-500 font-bold hover:underline"
+                  >
+                    全部清除
+                  </button>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5 min-h-[32px]">
+                  <span
+                    v-if="!dishForm.selectedMethod && dishForm.selectedIngredients.length === 0"
+                    class="text-xs text-gray-400 py-1"
+                  >
+                    尚未選擇任何作法或食材
+                  </span>
+                  <span
+                    v-if="dishForm.selectedMethod"
+                    class="inline-flex items-center gap-1 bg-indigo-100 text-indigo-900 border border-indigo-300 px-2.5 py-1 rounded-lg text-xs font-bold"
+                  >
+                    [作法] {{ dishForm.selectedMethod }}
+                    <button
+                      @click="selectDishMethod('')"
+                      class="text-indigo-500 hover:text-indigo-800 text-sm leading-none"
+                    >
+                      ×
+                    </button>
+                  </span>
+                  <span
+                    v-for="(ing, idx) in dishForm.selectedIngredients"
+                    :key="idx"
+                    class="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg text-xs font-bold"
+                  >
+                    {{ ing }}
+                    <button
+                      @click="removeDishIngredientToken(idx)"
+                      class="text-amber-600 hover:text-amber-900 text-sm leading-none"
+                    >
+                      ×
+                    </button>
+                  </span>
+                </div>
+              </div>
+
+              <!-- 1. 作法 -->
+              <div>
+                <div class="flex justify-between items-center mb-1.5">
+                  <span class="text-sm font-bold text-gray-800">作法 (選填，單選)：</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-1">
+                  <button
+                    v-for="m in methods"
+                    :key="m"
+                    @click="selectDishMethod(m)"
+                    :class="dishForm.selectedMethod === m ? 'bg-indigo-600 text-white font-bold' : 'bg-white border text-gray-800'"
+                    class="px-3 py-1.5 rounded-xl text-sm shadow-sm"
+                  >
+                    {{ m }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2. 食材庫 -->
+              <div>
+                <div class="flex justify-between items-center mb-1.5">
+                  <span class="text-sm font-bold text-gray-800">食材選擇 (可連續追加)：</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
+                  <button
+                    v-for="ing in ingredients"
+                    :key="ing.name"
+                    @click="handleIngredientClick(ing)"
+                    class="bg-white border text-gray-800 px-3 py-2 rounded-xl text-sm sm:text-base font-medium shadow-sm hover:border-amber-400"
+                  >
+                    {{ ing.name }}
+                  </button>
+                </div>
+
+                <!-- 形態別名選擇列（若點選的食材具備別名） -->
+                <div
+                  v-if="activeIngredientAliasGroup"
+                  class="flex flex-wrap items-center gap-1.5 mt-2 p-2.5 bg-amber-100/60 rounded-xl border border-amber-300"
+                >
+                  <span class="text-xs text-amber-900 font-bold shrink-0">選擇形態：</span>
+                  <button
+                    v-for="alias in [activeIngredientAliasGroup.name, ...activeIngredientAliasGroup.aliases]"
+                    :key="alias"
+                    @click="pushIngredientToken(alias)"
+                    class="bg-white text-amber-900 border border-amber-300 px-3 py-1 rounded-xl text-sm font-bold shadow-sm hover:bg-amber-200"
+                  >
+                    + {{ alias }}
+                  </button>
+                  <button
+                    @click="activeIngredientAliasGroup = null"
+                    class="text-xs text-gray-500 underline ml-auto"
+                  >
+                    收合
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 通路價格 -->
+            <div class="border-t border-gray-200 pt-3 mb-4">
+              <span class="text-sm font-bold text-gray-700 block mb-2"
+                >各通路價格 (依通路規則自動換算)：</span
+              >
+              <div class="grid grid-cols-2 gap-2.5">
+                <div v-for="ch in channels" :key="ch.key">
+                  <label class="text-xs sm:text-sm text-gray-600 block mb-1 font-medium">
+                    {{ ch.name }} {{ ch.markupPercent ? `(+${ch.markupPercent}%)` : '' }}
+                  </label>
+                  <input
+                    v-model.number="dishForm.prices[ch.key]"
+                    @input="ch.key === 'dine_in' ? applyAutoMarkup('dish') : null"
+                    type="number"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-center text-lg font-bold bg-white outline-none focus:border-amber-500"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="flex gap-3">
+          <!-- 固定底部儲存與取消 -->
+          <div class="p-4 border-t border-gray-200 bg-gray-50 flex gap-3 shrink-0">
             <button
               @click="closeModal"
               class="flex-1 bg-gray-200 active:bg-gray-300 py-3 rounded-xl font-bold text-base text-gray-800"
@@ -876,9 +877,12 @@
         class="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center sm:p-4 z-50"
       >
         <div
-          class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg p-5 shadow-2xl max-h-[92vh] overflow-y-auto"
+          class="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl max-h-[92vh] flex flex-col overflow-hidden"
         >
-          <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-200">
+          <!-- 固定頂部標題與關閉 -->
+          <div
+            class="flex justify-between items-center p-4 border-b border-gray-200 bg-white shrink-0"
+          >
             <h3 class="text-lg sm:text-xl font-bold text-rose-600">
               {{ pkgForm.id ? '修改套餐' : '組合多選套餐' }}
             </h3>
@@ -890,177 +894,184 @@
             </button>
           </div>
 
-          <div
-            class="flex items-center gap-3 mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-200"
-          >
-            <span class="text-sm font-bold text-gray-700">套餐狀態：</span>
-            <button
-              @click="pkgForm.active = !pkgForm.active"
-              :class="pkgForm.active !== false ? 'bg-emerald-600 text-white' : 'bg-gray-400 text-white'"
-              class="text-sm px-3.5 py-1.5 rounded-xl font-bold"
+          <!-- 滾動內容本體 -->
+          <div class="p-5 overflow-y-auto space-y-3.5">
+            <div
+              class="flex items-center gap-3 mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-200"
             >
-              {{ pkgForm.active !== false ? '✓ 供應中' : '✕ 已暫停售賣' }}
-            </button>
-          </div>
-
-          <label class="block text-sm font-bold text-gray-700 mb-1.5">套餐名稱：</label>
-          <input
-            v-model="pkgForm.name"
-            type="text"
-            placeholder="例如：超值雙人三菜一湯"
-            class="w-full border-2 border-rose-300 rounded-xl p-3 text-base sm:text-lg font-bold mb-3.5 outline-none"
-          />
-
-          <!-- 通路價格 -->
-          <div class="grid grid-cols-2 gap-2.5 mb-4">
-            <div v-for="ch in channels" :key="ch.key">
-              <label class="text-xs sm:text-sm text-gray-600 block mb-1 font-medium"
-                >{{ ch.name }}</label
-              >
-              <input
-                v-model.number="pkgForm.prices[ch.key]"
-                @input="ch.key === 'dine_in' ? applyAutoMarkup('package') : null"
-                type="number"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-center text-lg font-bold bg-white outline-none focus:border-rose-500"
-              />
-            </div>
-          </div>
-
-          <!-- 配菜插槽清單 -->
-          <div class="space-y-4 mb-5 border-t border-gray-200 pt-3">
-            <div class="flex justify-between items-center">
-              <span class="text-sm font-bold text-gray-700">配菜選項插槽：</span>
+              <span class="text-sm font-bold text-gray-700">套餐狀態：</span>
               <button
-                @click="addPkgSlot"
-                class="text-sm bg-gray-200 active:bg-gray-300 px-3 py-1.5 rounded-xl font-bold"
+                @click="pkgForm.active = !pkgForm.active"
+                :class="pkgForm.active !== false ? 'bg-emerald-600 text-white' : 'bg-gray-400 text-white'"
+                class="text-sm px-3.5 py-1.5 rounded-xl font-bold"
               >
-                + 增加菜項
+                {{ pkgForm.active !== false ? '✓ 供應中' : '✕ 已暫停售賣' }}
               </button>
             </div>
 
-            <div
-              v-for="(slot, sIdx) in pkgForm.slots"
-              :key="sIdx"
-              class="border border-gray-200 bg-gray-50 p-3.5 rounded-2xl"
-            >
-              <div class="flex justify-between items-center mb-2">
+            <label class="block text-sm font-bold text-gray-700 mb-1.5">套餐名稱：</label>
+            <input
+              v-model="pkgForm.name"
+              type="text"
+              placeholder="例如：超值雙人三菜一湯"
+              class="w-full border-2 border-rose-300 rounded-xl p-3 text-base sm:text-lg font-bold mb-3.5 outline-none"
+            />
+
+            <!-- 通路價格 -->
+            <div class="grid grid-cols-2 gap-2.5 mb-4">
+              <div v-for="ch in channels" :key="ch.key">
+                <label class="text-xs sm:text-sm text-gray-600 block mb-1 font-medium"
+                  >{{ ch.name }}</label
+                >
                 <input
-                  v-model="slot.name"
-                  class="font-bold text-sm sm:text-base bg-white border border-gray-300 rounded-lg px-2.5 py-1 outline-none w-36 text-gray-800"
+                  v-model.number="pkgForm.prices[ch.key]"
+                  @input="ch.key === 'dine_in' ? applyAutoMarkup('package') : null"
+                  type="number"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-center text-lg font-bold bg-white outline-none focus:border-rose-500"
                 />
-                <button
-                  @click="removePkgSlot(sIdx)"
-                  class="text-red-500 text-sm font-bold hover:text-red-700"
-                >
-                  移除此槽
-                </button>
               </div>
+            </div>
 
-              <!-- 已勾選/手動加入的清單 -->
-              <div class="mb-3 bg-white p-3 rounded-xl border border-rose-200">
-                <div class="flex justify-between items-center mb-1.5">
-                  <span class="text-xs sm:text-sm font-bold text-rose-800">目前可選料理：</span>
-                  <span
-                    class="text-xs bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-300"
-                  >
-                    已選 {{ slot.dishNames.length }} 項
-                  </span>
-                </div>
-                <div
-                  v-if="slot.dishNames.length === 0"
-                  class="text-xs sm:text-sm text-gray-400 py-1"
-                >
-                  尚未勾選或輸入任何料理
-                </div>
-                <div v-else class="flex flex-wrap gap-1.5">
-                  <span
-                    v-for="dishName in slot.dishNames"
-                    :key="dishName"
-                    class="inline-flex items-center gap-1.5 text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200 px-2.5 py-1 rounded-lg font-medium"
-                  >
-                    {{ dishName }}
-                    <button
-                      @click="removeDishFromSlot(slot, dishName)"
-                      class="text-rose-400 hover:text-rose-700 text-base font-bold leading-none"
-                    >
-                      ×
-                    </button>
-                  </span>
-                </div>
-              </div>
-
-              <!-- 手動新增套餐限定菜品 -->
-              <div class="flex gap-2 mb-2.5">
-                <input
-                  v-model="slot.customInput"
-                  @keyup.enter="addCustomDishToSlot(slot)"
-                  type="text"
-                  placeholder="輸入套餐限定單品（免加菜品庫）..."
-                  class="flex-1 border-2 border-rose-200 text-sm sm:text-base px-3 py-2 rounded-xl bg-white outline-none focus:border-rose-500 min-w-0"
-                />
-                <button
-                  type="button"
-                  @click="addCustomDishToSlot(slot)"
-                  class="bg-rose-50 border border-rose-300 text-rose-700 active:bg-rose-100 font-bold px-3.5 py-2 rounded-xl text-sm shrink-0 shadow-sm"
-                >
-                  + 加入限定品
-                </button>
-              </div>
-
-              <!-- 插槽內過濾篩選器 -->
-              <div class="flex flex-col sm:flex-row gap-2 mb-2">
-                <input
-                  v-model="slot.search"
-                  placeholder="搜尋菜名..."
-                  class="flex-1 border text-sm sm:text-base px-3 py-2 rounded-xl bg-white outline-none min-w-0"
-                />
-                <select
-                  v-model="slot.filterCategory"
-                  class="border text-sm sm:text-base px-2 py-2 rounded-xl bg-white text-gray-700 outline-none"
-                >
-                  <option value="">全部類別</option>
-                  <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
-                </select>
-              </div>
-
-              <!-- 勾選區塊 -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                <label
-                  v-for="d in getVisibleDishes(slot)"
-                  :key="d.id"
-                  class="flex items-center gap-2 text-sm sm:text-base bg-white p-2 rounded-xl border border-gray-200 active:bg-rose-50/30 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    :value="d.name"
-                    v-model="slot.dishNames"
-                    class="rounded w-4 h-4 text-rose-600"
-                  />
-                  <span class="truncate">
-                    {{ d.name }}
-                    <span class="text-xs text-gray-400">({{ d.category || '未分' }})</span>
-                  </span>
-                </label>
+            <!-- 配菜插槽清單 -->
+            <div class="space-y-4 mb-6 border-t border-gray-200 pt-3">
+              <div class="flex justify-between items-center">
+                <span class="text-sm font-bold text-gray-700">配菜選項插槽：</span>
               </div>
 
               <div
-                v-if="!slot.search && !slot.filterCategory && getMatchedDishes(slot).length > 6"
-                class="mt-2.5 text-center"
+                v-for="(slot, sIdx) in pkgForm.slots"
+                :key="sIdx"
+                class="border border-gray-200 bg-gray-50 p-3.5 rounded-2xl"
               >
-                <button
-                  @click="slot.expanded = !slot.expanded"
-                  class="text-xs sm:text-sm text-indigo-600 font-bold bg-indigo-50 hover:bg-indigo-100 py-1.5 px-4 rounded-full border border-indigo-200"
+                <div class="flex justify-between items-center mb-2">
+                  <input
+                    v-model="slot.name"
+                    class="font-bold text-sm sm:text-base bg-white border border-gray-300 rounded-lg px-2.5 py-1 outline-none w-36 text-gray-800"
+                  />
+                  <button
+                    @click="removePkgSlot(sIdx)"
+                    class="text-red-500 text-sm font-bold hover:text-red-700"
+                  >
+                    移除此槽
+                  </button>
+                </div>
+
+                <!-- 已勾選/手動加入的清單 -->
+                <div class="mb-3 bg-white p-3 rounded-xl border border-rose-200">
+                  <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-xs sm:text-sm font-bold text-rose-800">目前可選料理：</span>
+                    <span
+                      class="text-xs bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-300"
+                    >
+                      已選 {{ slot.dishNames.length }} 項
+                    </span>
+                  </div>
+                  <div
+                    v-if="slot.dishNames.length === 0"
+                    class="text-xs sm:text-sm text-gray-400 py-1"
+                  >
+                    尚未勾選或輸入任何料理
+                  </div>
+                  <div v-else class="flex flex-wrap gap-1.5">
+                    <span
+                      v-for="dishName in slot.dishNames"
+                      :key="dishName"
+                      class="inline-flex items-center gap-1.5 text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200 px-2.5 py-1 rounded-lg font-medium"
+                    >
+                      {{ dishName }}
+                      <button
+                        @click="removeDishFromSlot(slot, dishName)"
+                        class="text-rose-400 hover:text-rose-700 text-base font-bold leading-none"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 手動新增套餐限定菜品 -->
+                <div class="flex gap-2 mb-2.5">
+                  <input
+                    v-model="slot.customInput"
+                    @keyup.enter="addCustomDishToSlot(slot)"
+                    type="text"
+                    placeholder="輸入套餐限定單品（免加菜品庫）..."
+                    class="flex-1 border-2 border-rose-200 text-sm sm:text-base px-3 py-2 rounded-xl bg-white outline-none focus:border-rose-500 min-w-0"
+                  />
+                  <button
+                    type="button"
+                    @click="addCustomDishToSlot(slot)"
+                    class="bg-rose-50 border border-rose-300 text-rose-700 active:bg-rose-100 font-bold px-3.5 py-2 rounded-xl text-sm shrink-0 shadow-sm"
+                  >
+                    + 加入限定品
+                  </button>
+                </div>
+
+                <!-- 插槽內過濾篩選器 -->
+                <div class="flex flex-col sm:flex-row gap-2 mb-2">
+                  <input
+                    v-model="slot.search"
+                    placeholder="搜尋菜名..."
+                    class="flex-1 border text-sm sm:text-base px-3 py-2 rounded-xl bg-white outline-none min-w-0"
+                  />
+                  <select
+                    v-model="slot.filterCategory"
+                    class="border text-sm sm:text-base px-2 py-2 rounded-xl bg-white text-gray-700 outline-none"
+                  >
+                    <option value="">全部類別</option>
+                    <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+                  </select>
+                </div>
+
+                <!-- 勾選區塊 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  <label
+                    v-for="d in getVisibleDishes(slot)"
+                    :key="d.id"
+                    class="flex items-center gap-2 text-sm sm:text-base bg-white p-2 rounded-xl border border-gray-200 active:bg-rose-50/30 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="d.name"
+                      v-model="slot.dishNames"
+                      class="rounded w-4 h-4 text-rose-600"
+                    />
+                    <span class="truncate">
+                      {{ d.name }}
+                      <span class="text-xs text-gray-400">({{ d.category || '未分' }})</span>
+                    </span>
+                  </label>
+                </div>
+
+                <div
+                  v-if="!slot.search && !slot.filterCategory && getMatchedDishes(slot).length > 6"
+                  class="mt-2.5 text-center"
                 >
-                  {{ slot.expanded ? '▲ 收合料理清單' : `▼ 展開其餘 ${getMatchedDishes(slot).length
-                  - 6} 道料理` }}
-                </button>
+                  <button
+                    @click="slot.expanded = !slot.expanded"
+                    class="text-xs sm:text-sm text-indigo-600 font-bold bg-indigo-50 hover:bg-indigo-100 py-1.5 px-4 rounded-full border border-indigo-200"
+                  >
+                    {{ slot.expanded ? '▲ 收合料理清單' : `▼ 展開其餘
+                    ${getMatchedDishes(slot).length - 6} 道料理` }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="flex gap-3">
+          <!-- 彈窗內常駐浮動增加菜項按鈕 (FAB) -->
+          <button
+            type="button"
+            @click="addPkgSlot"
+            class="absolute right-5 bottom-20 z-30 bg-rose-600 active:bg-rose-700 text-white px-4 py-2.5 rounded-full font-bold text-sm sm:text-base shadow-xl flex items-center gap-1.5 border-2 border-white"
+          >
+            <span class="text-lg leading-none">+</span> 增加菜項
+          </button>
+
+          <!-- 固定底部儲存與取消 -->
+          <div class="p-4 border-t border-gray-200 bg-gray-50 flex gap-3 shrink-0">
             <button
               @click="closeModal"
               class="flex-1 bg-gray-200 active:bg-gray-300 py-3 rounded-xl font-bold text-base text-gray-800"
@@ -1076,8 +1087,25 @@
           </div>
         </div>
       </div>
-    </div>
 
+      <!-- 右下角常駐浮動動作按鈕 (FAB) -->
+      <div class="fixed right-4 bottom-5 flex flex-col gap-3 z-40">
+        <button
+          v-if="currentTab === 'dishes'"
+          @click="openModal('dish')"
+          class="bg-amber-600 active:bg-amber-700 text-white px-5 py-3 rounded-full shadow-xl font-bold text-base flex items-center gap-2 border-2 border-white"
+        >
+          <span class="text-xl leading-none">+</span> 新增料理
+        </button>
+        <button
+          v-if="currentTab === 'packages'"
+          @click="openModal('package')"
+          class="bg-rose-600 active:bg-rose-700 text-white px-5 py-3 rounded-full shadow-xl font-bold text-base flex items-center gap-2 border-2 border-white"
+        >
+          <span class="text-xl leading-none">+</span> 組合套餐
+        </button>
+      </div>
+    </div>
     <script type="module" src="js/app.js"></script>
   </body>
 </html>
