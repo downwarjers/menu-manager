@@ -59,6 +59,11 @@ createApp({
         try {
           const data = JSON.parse(raw);
 
+          if (data.version !== CURRENT_DATA_VERSION) {
+            localStorage.removeItem('restaurant_menu_master');
+            return;
+          }
+
           if (Array.isArray(data.channels)) {
             channels.value = data.channels;
           }

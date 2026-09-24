@@ -1,4 +1,4 @@
-export const CURRENT_DATA_VERSION = '2026.09.6';
+export const CURRENT_DATA_VERSION = '2026.09.7';
 
 export const DEFAULT_CHANNELS = [
   { key: 'dine_in', name: '內用/紙本', markupPercent: 0, roundMode: 'round1' },
