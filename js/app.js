@@ -5,6 +5,7 @@ import {
   DEFAULT_INGREDIENTS,
   DEFAULT_METHODS,
   DEFAULT_DISHES,
+  DEFAULT_PACKAGES,
 } from './data.js';
 
 const { createApp, ref, computed, watch, onMounted } = Vue;
@@ -25,7 +26,7 @@ createApp({
     const methods = ref(DEFAULT_METHODS);
 
     const dishes = ref(DEFAULT_DISHES);
-    const packages = ref([]);
+    const packages = ref(DEFAULT_PACKAGES);
 
     const dishSearch = ref('');
     const dishFilterCategory = ref('');
