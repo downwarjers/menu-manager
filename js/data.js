@@ -3,7 +3,7 @@ export const CURRENT_DATA_VERSION = '2026.09.10';
 export const DEFAULT_CHANNELS = [
   { key: 'dine_in', name: '內用/紙本', markupPercent: 0, roundMode: 'round1' },
   { key: 'pos', name: '微碧/POS', markupPercent: 0, roundMode: 'round1' },
-  { key: 'uber', name: 'Uber Eats', markupPercent: 25, roundMode: 'ceil5' },
+  { key: 'uber', name: 'Uber Eats', markupPercent: 30, roundMode: 'end9' },
   { key: 'panda', name: 'Foodpanda', markupPercent: 30, roundMode: 'end9' },
 ];
 
