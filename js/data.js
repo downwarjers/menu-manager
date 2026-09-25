@@ -1,4 +1,4 @@
-export const CURRENT_DATA_VERSION = '2026.09.10';
+export const CURRENT_DATA_VERSION = '2026.09.25';
 
 export const DEFAULT_CHANNELS = [
   { key: 'dine_in', name: '內用/紙本', markupPercent: 0, roundMode: 'round1' },
@@ -2129,12 +2129,12 @@ export const DEFAULT_DISHES = [
   },
   {
     id: 139,
-    name: '藥膳人蔘烏骨雞湯',
+    name: '藥膳人蔘雞湯',
+    active: true,
     mode: 'combine',
     category: '湯品',
     method: '',
     ingredients: ['雞肉', '湯'],
-    active: true,
     prices: {
       dine_in: 600,
       pos: 600,
@@ -2338,67 +2338,83 @@ export const DEFAULT_PACKAGES = [
     slots: [
       {
         name: '菜1',
+        autoSort: true,
         dishNames: ['鹽烤台灣鯛'],
       },
       {
         name: '菜2',
+        autoSort: true,
         dishNames: ['鹽烤胡椒魚', '鹽烤鱸魚'],
       },
       {
         name: '菜3',
-        dishNames: ['黑胡椒牛小排', '椒鹽牛小排'],
+        autoSort: true,
+        dishNames: ['椒鹽牛小排', '黑胡椒牛小排'],
       },
       {
         name: '菜4',
+        autoSort: true,
         dishNames: ['絲瓜蛤蠣'],
       },
       {
         name: '菜5',
+        autoSort: true,
         dishNames: ['時令季節鮮蔬'],
       },
       {
         name: '菜6',
+        autoSort: true,
         dishNames: ['金沙魟魚'],
       },
       {
         name: '菜7',
+        autoSort: true,
         dishNames: ['川味牛肉'],
       },
       {
         name: '菜8',
+        autoSort: true,
         dishNames: ['香酥花枝丸', '剝皮辣椒蛋'],
       },
       {
         name: '菜9',
+        autoSort: true,
         dishNames: ['香酥鮮蚵'],
       },
       {
         name: '菜10',
-        dishNames: ['鹽烤泰國蝦', '三杯泰國蝦', '避風塘鮮蝦'],
+        autoSort: true,
+        dishNames: ['三杯泰國蝦', '避風塘鮮蝦', '鹽烤泰國蝦'],
       },
       {
         name: '菜11',
-        dishNames: ['糖醋排骨', '椒鹽排骨', '黑胡椒排骨'],
+        autoSort: true,
+        dishNames: ['椒鹽排骨', '黑胡椒排骨', '蜜汁排骨', '糖醋排骨'],
       },
       {
         name: '菜12',
+        autoSort: true,
         dishNames: ['薑絲大腸'],
       },
       {
         name: '菜13',
+        autoSort: true,
         dishNames: ['蔥爆松阪豬'],
       },
       {
         name: '菜14',
+        autoSort: true,
         dishNames: ['梅子雞'],
       },
       {
         name: '菜15',
+        autoSort: true,
         dishNames: ['回鍋肥腸'],
       },
       {
         name: '湯1',
-        dishNames: ['剝皮辣椒雞湯', '鳳梨苦瓜雞湯', '麻香猴頭菇鮮雞湯', '藥膳人蔘烏骨雞湯'],
+        autoSort: true,
+        dishNames: ['剝皮辣椒雞湯', '麻香猴頭菇鮮雞湯', '鳳梨苦瓜雞湯', '藥膳人蔘雞湯'],
       },
     ],
   },
@@ -2415,51 +2431,63 @@ export const DEFAULT_PACKAGES = [
     slots: [
       {
         name: '菜1',
-        dishNames: ['宮保蝦球', '金沙蝦球', '蜜汁蝦球', '鳳梨蝦球', '川味蝦球'],
+        autoSort: true,
+        dishNames: ['川味蝦球', '金沙蝦球', '宮保蝦球', '蜜汁蝦球', '鳳梨蝦球'],
       },
       {
         name: '菜2',
+        autoSort: true,
         dishNames: ['川味豆腐', '紅燒豆腐', '塔香豆腐'],
       },
       {
         name: '菜3',
+        autoSort: true,
         dishNames: ['時令季節鮮蔬'],
       },
       {
         name: '菜4',
+        autoSort: true,
         dishNames: ['三杯魟魚'],
       },
       {
         name: '菜5',
+        autoSort: true,
         dishNames: ['客家小炒'],
       },
       {
         name: '菜6',
+        autoSort: true,
         dishNames: ['薑煸雞'],
       },
       {
         name: '菜7',
+        autoSort: true,
         dishNames: ['香酥鮮蚵'],
       },
       {
         name: '菜8',
+        autoSort: true,
         dishNames: ['鹽烤台灣鯛', '鹽烤胡椒魚', '鹽烤鱸魚'],
       },
       {
         name: '菜9',
+        autoSort: true,
         dishNames: ['回鍋肉'],
       },
       {
         name: '菜10',
+        autoSort: true,
         dishNames: ['椒鹽牛小排', '黑胡椒牛小排'],
       },
       {
         name: '菜11',
+        autoSort: true,
         dishNames: ['鹽烤泰國蝦'],
       },
       {
         name: '湯1',
-        dishNames: ['剝皮辣椒雞湯', '麻香猴頭菇鮮雞湯', '鳳梨苦瓜雞湯', '藥膳人蔘烏骨雞湯'],
+        autoSort: true,
+        dishNames: ['剝皮辣椒雞湯', '麻香猴頭菇鮮雞湯', '鳳梨苦瓜雞湯', '藥膳人蔘雞湯'],
       },
     ],
   },
@@ -2476,43 +2504,53 @@ export const DEFAULT_PACKAGES = [
     slots: [
       {
         name: '菜1',
+        autoSort: true,
         dishNames: ['芹菜中卷', '芹菜牛肉'],
       },
       {
         name: '菜2',
-        dishNames: ['滑蛋蝦仁', '滑蛋肉絲', '滑蛋牛肉'],
+        autoSort: true,
+        dishNames: ['滑蛋牛肉', '滑蛋肉絲', '滑蛋蝦仁'],
       },
       {
         name: '菜3',
+        autoSort: true,
         dishNames: ['時令季節鮮蔬'],
       },
       {
         name: '菜4',
-        dishNames: ['金沙杏鮑菇', '鹽酥杏鮑菇', '塔香杏鮑菇', '黑胡椒杏鮑菇'],
+        autoSort: true,
+        dishNames: ['金沙杏鮑菇', '黑胡椒杏鮑菇', '塔香杏鮑菇', '鹽酥杏鮑菇'],
       },
       {
         name: '菜5',
+        autoSort: true,
         dishNames: ['蜜汁排骨', '糖醋排骨'],
       },
       {
         name: '菜6',
+        autoSort: true,
         dishNames: ['薑絲大腸'],
       },
       {
         name: '菜7',
+        autoSort: true,
         dishNames: ['鹽烤台灣鯛', '鹽烤胡椒魚', '鹽烤鱸魚'],
       },
       {
         name: '菜8',
+        autoSort: true,
         dishNames: ['宮保豆腐'],
       },
       {
         name: '菜9',
+        autoSort: true,
         dishNames: ['宮保皮蛋', '鹽酥皮蛋'],
       },
       {
         name: '湯1',
-        dishNames: ['蚵仔湯', '蛤蠣湯', '豆腐蛋花湯', '味噌鮮魚湯'],
+        autoSort: true,
+        dishNames: ['豆腐蛋花湯', '味噌鮮魚湯', '蚵仔湯', '蛤蠣湯'],
       },
     ],
   },
@@ -2529,31 +2567,43 @@ export const DEFAULT_PACKAGES = [
     slots: [
       {
         name: '菜1',
+        autoSort: true,
         dishNames: ['絲瓜蛤蠣'],
       },
       {
         name: '菜2',
-        dishNames: ['蜜汁雞翅', '椒鹽雞翅'],
+        autoSort: true,
+        dishNames: ['椒鹽雞翅', '蜜汁雞翅'],
       },
       {
         name: '菜3',
+        autoSort: true,
         dishNames: ['時令季節鮮蔬'],
       },
       {
         name: '菜4',
+        autoSort: true,
         dishNames: ['鹽烤台灣鯛'],
       },
       {
         name: '菜5',
-        dishNames: ['麻辣鴨血'],
+        autoSort: true,
+        dishNames: ['客家小炒'],
       },
       {
         name: '菜6',
+        autoSort: true,
+        dishNames: ['麻辣鴨血'],
+      },
+      {
+        name: '菜7',
+        autoSort: true,
         dishNames: ['雨來菇炒蛋'],
       },
       {
         name: '湯1',
-        dishNames: ['蚵仔湯', '味噌鮮魚湯', '蛤蠣湯', '豆腐蛋花湯'],
+        autoSort: true,
+        dishNames: ['豆腐蛋花湯', '味噌鮮魚湯', '蚵仔湯', '蛤蠣湯'],
       },
     ],
   },
@@ -2570,27 +2620,33 @@ export const DEFAULT_PACKAGES = [
     slots: [
       {
         name: '菜1',
+        autoSort: true,
         dishNames: ['菜脯蛋', '蔥蛋', '剝皮辣椒蛋'],
       },
       {
         name: '菜2',
+        autoSort: true,
         dishNames: ['時令季節鮮蔬'],
       },
       {
         name: '菜3',
-        dishNames: ['川味豆腐', '糖醋豆腐', '塔香豆腐'],
+        autoSort: true,
+        dishNames: ['川味豆腐', '塔香豆腐', '糖醋豆腐'],
       },
       {
         name: '菜4',
+        autoSort: true,
         dishNames: ['鹽烤台灣鯛'],
       },
       {
         name: '菜5',
-        dishNames: ['蔥爆豬肉', '蔥爆牛肉', '蔥爆中卷', '蔥爆雞丁'],
+        autoSort: true,
+        dishNames: ['蔥爆中卷', '蔥爆牛肉', '蔥爆豬肉', '蔥爆雞丁'],
       },
       {
         name: '湯1',
-        dishNames: ['蚵仔湯', '味噌鮮魚湯', '豆腐蛋花湯', '蛤蠣湯'],
+        autoSort: true,
+        dishNames: ['豆腐蛋花湯', '味噌鮮魚湯', '蚵仔湯', '蛤蠣湯'],
       },
     ],
   },
@@ -2607,23 +2663,28 @@ export const DEFAULT_PACKAGES = [
     slots: [
       {
         name: '菜1',
+        autoSort: true,
         dishNames: ['時令季節鮮蔬'],
       },
       {
         name: '菜2',
-        dishNames: ['醬爆雞丁', '醬爆豬肉', '醬爆牛肉'],
+        autoSort: true,
+        dishNames: ['醬爆牛肉', '醬爆豬肉', '醬爆雞丁'],
       },
       {
         name: '菜3',
+        autoSort: true,
         dishNames: ['鹽酥黑輪片'],
       },
       {
         name: '菜4',
-        dishNames: ['蔥蛋', '菜脯蛋'],
+        autoSort: true,
+        dishNames: ['菜脯蛋', '蔥蛋'],
       },
       {
         name: '湯',
-        dishNames: ['蚵仔湯', '蛤蠣湯', '豆腐蛋花湯', '味噌鮮魚湯'],
+        autoSort: true,
+        dishNames: ['豆腐蛋花湯', '味噌鮮魚湯', '蚵仔湯', '蛤蠣湯'],
       },
     ],
   },

@@ -92,7 +92,15 @@ createApp({
               return {
                 ...p,
                 active: p.active !== false,
-                slots: Array.isArray(p.slots) ? p.slots : [],
+                slots: Array.isArray(p.slots)
+                  ? p.slots.map((s) => {
+                      return {
+                        ...s,
+                        autoSort: s.autoSort !== false,
+                        dishNames: Array.isArray(s.dishNames) ? s.dishNames : [],
+                      };
+                    })
+                  : [],
               };
             });
           }
@@ -298,6 +306,7 @@ createApp({
               expanded: false,
               customInput: '',
               dishNames: [],
+              autoSort: true,
             },
           ],
         };
@@ -588,6 +597,24 @@ createApp({
         const idx = dishes.value.findIndex((d) => {
           return d.id === dishForm.value.id;
         });
+        const oldName = idx !== -1 ? dishes.value[idx].name : null;
+        if (oldName && oldName !== name) {
+          packages.value.forEach((pkg) => {
+            if (Array.isArray(pkg.slots)) {
+              pkg.slots.forEach((slot) => {
+                if (Array.isArray(slot.dishNames) && slot.dishNames.includes(oldName)) {
+                  slot.dishNames = [
+                    ...new Set(
+                      slot.dishNames.map((dName) => {
+                        return dName === oldName ? name : dName;
+                      }),
+                    ),
+                  ];
+                }
+              });
+            }
+          });
+        }
         if (idx !== -1) {
           dishes.value[idx] = payload;
         }
@@ -621,9 +648,49 @@ createApp({
         expanded: false,
         customInput: '',
         dishNames: [],
+        autoSort: true,
       });
     };
 
+    const movePkgSlot = (idx, direction) => {
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= pkgForm.value.slots.length) {
+        return;
+      }
+      const temp = pkgForm.value.slots[idx];
+      pkgForm.value.slots[idx] = pkgForm.value.slots[targetIdx];
+      pkgForm.value.slots[targetIdx] = temp;
+    };
+
+    const sortPkgSlotsByName = () => {
+      pkgForm.value.slots.sort((a, b) => {
+        return (a.name || '').localeCompare(b.name || '', 'zh-Hant', { numeric: true });
+      });
+    };
+
+    const sortSlotDishNames = (slot) => {
+      if (!slot || !Array.isArray(slot.dishNames)) {
+        return;
+      }
+      slot.dishNames = [...slot.dishNames].sort((a, b) => {
+        return a.localeCompare(b, 'zh-Hant');
+      });
+    };
+
+    const onSlotAutoSortChange = (slot) => {
+      if (slot && slot.autoSort) {
+        sortSlotDishNames(slot);
+      }
+    };
+
+    const handleDishCheckboxToggle = (slot, dishName) => {
+      if (!slot) {
+        return;
+      }
+      if (slot.autoSort) {
+        sortSlotDishNames(slot);
+      }
+    };
     const removePkgSlot = (idx) => {
       pkgForm.value.slots.splice(idx, 1);
     };
@@ -651,6 +718,9 @@ createApp({
         return;
       }
       slot.dishNames.push(name);
+      if (slot.autoSort) {
+        sortSlotDishNames(slot);
+      }
       slot.customInput = '';
     };
 
@@ -681,6 +751,7 @@ createApp({
         slots: pkgForm.value.slots.map((s) => {
           return {
             name: s.name,
+            autoSort: s.autoSort !== false,
             dishNames: [...s.dishNames],
           };
         }),
@@ -715,6 +786,7 @@ createApp({
                 expanded: false,
                 customInput: '',
                 dishNames: Array.isArray(s.dishNames) ? [...s.dishNames] : [],
+                autoSort: s.autoSort !== false,
               };
             })
           : [],
@@ -999,6 +1071,11 @@ createApp({
       saveDish,
       editDish,
       addPkgSlot,
+      movePkgSlot,
+      sortPkgSlotsByName,
+      sortSlotDishNames,
+      onSlotAutoSortChange,
+      handleDishCheckboxToggle,
       removePkgSlot,
       removeDishFromSlot,
       addCustomDishToSlot,

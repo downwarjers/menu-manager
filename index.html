@@ -938,6 +938,13 @@
             <div class="space-y-4 mb-6 border-t border-gray-200 pt-3">
               <div class="flex justify-between items-center">
                 <span class="text-sm font-bold text-gray-700">配菜選項插槽：</span>
+                <button
+                  type="button"
+                  @click="sortPkgSlotsByName"
+                  class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-2.5 py-1 rounded-lg border border-gray-300 shadow-sm"
+                >
+                  依槽名稱排序
+                </button>
               </div>
 
               <div
@@ -945,14 +952,36 @@
                 :key="sIdx"
                 class="border border-gray-200 bg-gray-50 p-3.5 rounded-2xl"
               >
-                <div class="flex justify-between items-center mb-2">
-                  <input
-                    v-model="slot.name"
-                    class="font-bold text-sm sm:text-base bg-white border border-gray-300 rounded-lg px-2.5 py-1 outline-none w-36 text-gray-800"
-                  />
+                <div class="flex justify-between items-center mb-2 gap-2">
+                  <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                    <input
+                      v-model="slot.name"
+                      class="font-bold text-sm sm:text-base bg-white border border-gray-300 rounded-lg px-2.5 py-1 outline-none w-32 sm:w-36 text-gray-800"
+                    />
+                    <button
+                      type="button"
+                      @click="movePkgSlot(sIdx, -1)"
+                      :disabled="sIdx === 0"
+                      :class="sIdx === 0 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-200'"
+                      class="px-2 py-1 rounded-md text-sm font-bold border border-gray-200 bg-white"
+                      title="上移此槽"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      @click="movePkgSlot(sIdx, 1)"
+                      :disabled="sIdx === pkgForm.slots.length - 1"
+                      :class="sIdx === pkgForm.slots.length - 1 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-200'"
+                      class="px-2 py-1 rounded-md text-sm font-bold border border-gray-200 bg-white"
+                      title="下移此槽"
+                    >
+                      ↓
+                    </button>
+                  </div>
                   <button
                     @click="removePkgSlot(sIdx)"
-                    class="text-red-500 text-sm font-bold hover:text-red-700"
+                    class="text-red-500 text-sm font-bold hover:text-red-700 shrink-0"
                   >
                     移除此槽
                   </button>
@@ -960,13 +989,26 @@
 
                 <!-- 已勾選/手動加入的清單 -->
                 <div class="mb-3 bg-white p-3 rounded-xl border border-rose-200">
-                  <div class="flex justify-between items-center mb-1.5">
-                    <span class="text-xs sm:text-sm font-bold text-rose-800">目前可選料理：</span>
-                    <span
-                      class="text-xs bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-300"
+                  <div class="flex flex-wrap justify-between items-center gap-1.5 mb-1.5">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs sm:text-sm font-bold text-rose-800">目前可選料理：</span>
+                      <span
+                        class="text-xs bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-300"
+                      >
+                        已選 {{ slot.dishNames.length }} 項
+                      </span>
+                    </div>
+                    <label
+                      class="inline-flex items-center gap-1 text-xs text-gray-600 font-medium cursor-pointer select-none"
                     >
-                      已選 {{ slot.dishNames.length }} 項
-                    </span>
+                      <input
+                        type="checkbox"
+                        v-model="slot.autoSort"
+                        @change="onSlotAutoSortChange(slot)"
+                        class="rounded w-3.5 h-3.5 text-rose-600"
+                      />
+                      自動排序菜品
+                    </label>
                   </div>
                   <div
                     v-if="slot.dishNames.length === 0"
@@ -1036,6 +1078,7 @@
                       type="checkbox"
                       :value="d.name"
                       v-model="slot.dishNames"
+                      @change="handleDishCheckboxToggle(slot, d.name)"
                       class="rounded w-4 h-4 text-rose-600"
                     />
                     <span class="truncate">
