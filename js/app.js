@@ -1,12 +1,4 @@
-import {
-  CURRENT_DATA_VERSION,
-  DEFAULT_CHANNELS,
-  DEFAULT_CATEGORIES,
-  DEFAULT_INGREDIENTS,
-  DEFAULT_METHODS,
-  DEFAULT_DISHES,
-  DEFAULT_PACKAGES,
-} from './data.js';
+const CURRENT_DATA_VERSION = '2026.09.25';
 
 const { createApp, ref, computed, watch, onMounted } = Vue;
 
@@ -18,15 +10,15 @@ createApp({
     const baseEditIndex = ref(null);
     const lastBackupTime = ref(null);
 
-    const channels = ref(DEFAULT_CHANNELS);
+    const channels = ref();
     const tempChannels = ref([]);
 
-    const categories = ref(DEFAULT_CATEGORIES);
-    const ingredients = ref(DEFAULT_INGREDIENTS);
-    const methods = ref(DEFAULT_METHODS);
+    const categories = ref();
+    const ingredients = ref();
+    const methods = ref();
 
-    const dishes = ref(DEFAULT_DISHES);
-    const packages = ref(DEFAULT_PACKAGES);
+    const dishes = ref();
+    const packages = ref();
 
     const dishSearch = ref('');
     const dishFilterCategory = ref('');
@@ -55,60 +47,75 @@ createApp({
     const activeIngredientAliasGroup = ref(null);
     const pkgForm = ref({ id: null, name: '', active: true, prices: {}, slots: [] });
 
-    onMounted(() => {
-      const raw = localStorage.getItem('restaurant_menu_master');
-      if (raw) {
-        try {
-          const data = JSON.parse(raw);
+    const applyDataset = (data) => {
+      if (Array.isArray(data.channels)) {
+        channels.value = data.channels;
+      }
+      if (Array.isArray(data.categories)) {
+        categories.value = data.categories;
+      }
+      if (Array.isArray(data.ingredients)) {
+        ingredients.value = data.ingredients;
+      }
+      if (Array.isArray(data.methods)) {
+        methods.value = data.methods;
+      }
+      if (Array.isArray(data.dishes)) {
+        dishes.value = data.dishes.map((d) => {
+          return {
+            ...d,
+            active: d.active !== false,
+            ingredients: Array.isArray(d.ingredients) ? d.ingredients : [],
+          };
+        });
+      }
+      if (Array.isArray(data.packages)) {
+        packages.value = data.packages.map((p) => {
+          return {
+            ...p,
+            active: p.active !== false,
+            slots: Array.isArray(p.slots)
+              ? p.slots.map((s) => {
+                  return {
+                    ...s,
+                    autoSort: s.autoSort !== false,
+                    dishNames: Array.isArray(s.dishNames) ? s.dishNames : [],
+                  };
+                })
+              : [],
+          };
+        });
+      }
+      if (data.lastBackupTime) {
+        lastBackupTime.value = data.lastBackupTime;
+      }
+    };
 
-          if (data.version !== CURRENT_DATA_VERSION) {
-            localStorage.removeItem('restaurant_menu_master');
-            return;
-          }
+    onMounted(async () => {
+      let loadedFromJSON = false;
 
-          if (Array.isArray(data.channels)) {
-            channels.value = data.channels;
+      // 優先載入外部的 data/latest.json
+      try {
+        const res = await fetch('./data/latest.json', { cache: 'no-cache' });
+        if (res.ok) {
+          const jsonData = await res.json();
+          applyDataset(jsonData);
+          loadedFromJSON = true;
+        }
+      } catch (err) {
+        console.warn('未載入 ./data/latest.json，改用本地儲存快取。');
+      }
+
+      // 若無 external JSON，則回退至 LocalStorage 快取
+      if (!loadedFromJSON) {
+        const raw = localStorage.getItem('restaurant_menu_master');
+        if (raw) {
+          try {
+            const localData = JSON.parse(raw);
+            applyDataset(localData);
+          } catch (e) {
+            console.error('讀取異常，恢復預設設定', e);
           }
-          if (Array.isArray(data.categories)) {
-            categories.value = data.categories;
-          }
-          if (Array.isArray(data.ingredients)) {
-            ingredients.value = data.ingredients;
-          }
-          if (Array.isArray(data.methods)) {
-            methods.value = data.methods;
-          }
-          if (Array.isArray(data.dishes)) {
-            dishes.value = data.dishes.map((d) => {
-              return {
-                ...d,
-                active: d.active !== false,
-                ingredients: Array.isArray(d.ingredients) ? d.ingredients : [],
-              };
-            });
-          }
-          if (Array.isArray(data.packages)) {
-            packages.value = data.packages.map((p) => {
-              return {
-                ...p,
-                active: p.active !== false,
-                slots: Array.isArray(p.slots)
-                  ? p.slots.map((s) => {
-                      return {
-                        ...s,
-                        autoSort: s.autoSort !== false,
-                        dishNames: Array.isArray(s.dishNames) ? s.dishNames : [],
-                      };
-                    })
-                  : [],
-              };
-            });
-          }
-          if (data.lastBackupTime) {
-            lastBackupTime.value = data.lastBackupTime;
-          }
-        } catch (e) {
-          console.error('讀取異常，恢復預設設定', e);
         }
       }
     });
