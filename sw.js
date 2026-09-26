@@ -1,9 +1,12 @@
-const CACHE_NAME = 'menu-manager-v1';
+const CACHE_NAME = 'menu-manager-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
+  './manifest.webmanifest',
   './css/style.css',
   './data/latest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './js/app.js',
   './js/state/menuStore.js',
   './js/utils/exporter.js',
@@ -17,8 +20,6 @@ const STATIC_ASSETS = [
   './js/components/modals/IngredientModal.js',
   './js/components/modals/PackageModal.js',
   './js/components/modals/SimpleBaseModal.js',
-  'https://cdn.tailwindcss.com',
-  'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js',
 ];
 
 self.addEventListener('install', (event) => {
@@ -46,20 +47,29 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // 對最新資料檔採取 Network-First 策略，其餘靜態檔採取 Cache-First
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // 針對最新資料採用 Network-First
   if (event.request.url.includes('/data/latest.json')) {
     event.respondWith(
       fetch(event.request)
         .then((res) => {
           const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then((cache) => {
+            return cache.put(event.request, clone);
+          });
           return res;
         })
-        .catch(() => caches.match(event.request)),
+        .catch(() => {
+          return caches.match(event.request);
+        }),
     );
     return;
   }
 
+  // 其餘資源採用 Cache-First, 失敗則回退網路並寫入快取
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return (
@@ -69,7 +79,9 @@ self.addEventListener('fetch', (event) => {
             return res;
           }
           const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then((cache) => {
+            return cache.put(event.request, clone);
+          });
           return res;
         })
       );
