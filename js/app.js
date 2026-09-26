@@ -36,12 +36,18 @@ createApp({
 
     onMounted(async () => {
       await initStore();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.error('ServiceWorker 註冊失敗:', err);
+        });
+      }
     });
 
     const backupWarning = computed(() => {
-      if (!store.lastBackupTime) return true;
-      const diffDays =
-        (Date.now() - new Date(store.lastBackupTime).getTime()) / (1000 * 3600 * 24);
+      if (!store.lastBackupTime) {
+        return true;
+      }
+      const diffDays = (Date.now() - new Date(store.lastBackupTime).getTime()) / (1000 * 3600 * 24);
       return diffDays >= 7;
     });
 
