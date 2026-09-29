@@ -1,12 +1,12 @@
 {
-  "version": "2026.09.25",
-  "exportedAt": "2026-09-26T00:22:50.704Z",
+  "version": "2026.09.26",
+  "exportedAt": "2026-09-29T15:20:39.046Z",
   "channels": [
     {
       "key": "dine_in",
       "name": "內用/紙本",
       "markupPercent": 0,
-      "roundMode": "round1"
+      "roundMode": "none"
     },
     {
       "key": "pos",
@@ -187,6 +187,18 @@
     {
       "name": "湯",
       "aliases": []
+    },
+    {
+      "name": "鳳梨",
+      "aliases": []
+    },
+    {
+      "name": "蒜蓉",
+      "aliases": []
+    },
+    {
+      "name": "豆豉",
+      "aliases": []
     }
   ],
   "methods": [
@@ -212,6 +224,77 @@
     "避風塘"
   ],
   "dishes": [
+    {
+      "id": 1790690130108,
+      "name": "豆豉鮮蚵",
+      "active": true,
+      "mode": "combine",
+      "category": "熱炒",
+      "method": "",
+      "ingredients": [
+        "豆豉",
+        "鮮蚵"
+      ],
+      "prices": {
+        "dine_in": 200,
+        "pos": 200,
+        "panda": 269,
+        "ch_1790273628034": 269
+      }
+    },
+    {
+      "id": 1790690045378,
+      "name": "鳳梨蝦球",
+      "active": true,
+      "mode": "combine",
+      "category": "熱炒",
+      "method": "",
+      "ingredients": [
+        "鳳梨",
+        "蝦球"
+      ],
+      "prices": {
+        "dine_in": 280,
+        "pos": 280,
+        "panda": 369,
+        "ch_1790273628034": 369
+      }
+    },
+    {
+      "id": 1790690009370,
+      "name": "蒜蓉豆腐",
+      "active": true,
+      "mode": "combine",
+      "category": "熱炒",
+      "method": "",
+      "ingredients": [
+        "蒜蓉",
+        "豆腐"
+      ],
+      "prices": {
+        "dine_in": 170,
+        "pos": 170,
+        "panda": 229,
+        "ch_1790273628034": 229
+      }
+    },
+    {
+      "id": 1790689967594,
+      "name": "塔香豆腐",
+      "active": true,
+      "mode": "combine",
+      "category": "熱炒",
+      "method": "塔香",
+      "ingredients": [
+        "豆腐"
+      ],
+      "prices": {
+        "dine_in": 180,
+        "pos": 180,
+        "panda": 239,
+        "ch_1790273628034": 239
+      }
+    },
     {
       "id": 1,
       "name": "皮蛋牛肉",
@@ -2024,14 +2107,14 @@
     },
     {
       "id": 101,
-      "name": "烤鯖魚(2支)",
+      "name": "烤鯖魚",
+      "active": true,
       "mode": "combine",
       "category": "烤物",
       "method": "烤",
       "ingredients": [
         "鯖魚"
       ],
-      "active": true,
       "prices": {
         "dine_in": 160,
         "pos": 160,
@@ -3031,8 +3114,7 @@
           "name": "菜8",
           "autoSort": true,
           "dishNames": [
-            "香酥花枝丸",
-            "剝皮辣椒蛋"
+            "香酥花枝丸"
           ]
         },
         {
@@ -3047,6 +3129,7 @@
           "autoSort": true,
           "dishNames": [
             "三杯泰國蝦",
+            "三杯鮮蝦",
             "避風塘鮮蝦",
             "鹽烤泰國蝦"
           ]
@@ -3090,13 +3173,21 @@
           ]
         },
         {
+          "name": "菜16",
+          "autoSort": true,
+          "dishNames": [
+            "剝皮辣椒蛋"
+          ]
+        },
+        {
           "name": "湯1",
           "autoSort": true,
           "dishNames": [
             "剝皮辣椒雞湯",
             "麻香猴頭菇鮮雞湯",
             "鳳梨苦瓜雞湯",
-            "藥膳人蔘雞湯"
+            "藥膳人蔘雞湯",
+            "鱸魚蛤蠣湯"
           ]
         }
       ]
@@ -3206,7 +3297,8 @@
             "剝皮辣椒雞湯",
             "麻香猴頭菇鮮雞湯",
             "鳳梨苦瓜雞湯",
-            "藥膳人蔘雞湯"
+            "藥膳人蔘雞湯",
+            "鱸魚蛤蠣湯"
           ]
         }
       ]
@@ -3398,6 +3490,7 @@
           "name": "菜1",
           "autoSort": true,
           "dishNames": [
+            "九層塔蛋",
             "剝皮辣椒蛋",
             "菜脯蛋",
             "蔥蛋"
@@ -3504,5 +3597,5 @@
       ]
     }
   ],
-  "lastBackupTime": "2026-09-26T00:22:50.704Z"
+  "lastBackupTime": "2026-09-29T15:20:39.046Z"
 }

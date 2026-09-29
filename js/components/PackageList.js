@@ -3,7 +3,7 @@ import { store, deleteStoreItem } from '../state/menuStore.js';
 
 export default {
   name: 'PackageList',
-  emits: ['edit'],
+  emits: ['edit', 'edit-slot'],
   setup(props, { emit }) {
     const pkgSearch = ref('');
     const pkgSort = ref('default');
@@ -47,6 +47,9 @@ export default {
       getValidSlots,
       editPackage: (pkg) => {
         return emit('edit', pkg);
+      },
+      editSlot: (pkg, slotIndex) => {
+        return emit('edit-slot', { pkg, slotIndex });
       },
       deletePackage: (id) => {
         return deleteStoreItem('packages', id);
@@ -132,12 +135,22 @@ export default {
 
         <div class="text-sm sm:text-base text-gray-700 space-y-2">
           <div
-+            v-for="(slot, sIdx) in getValidSlots(pkg)"
-              :key="sIdx"
-            class="bg-gray-100 px-3 py-2 rounded-xl leading-relaxed"
+            v-for="(slot, sIdx) in pkg.slots"
+            :key="sIdx"
+            v-show="slot.dishNames && slot.dishNames.length > 0"
+            class="bg-gray-100 px-3 py-2 rounded-xl leading-relaxed flex items-center justify-between gap-2"
           >
-            <span class="font-bold text-gray-900">{{ slot.name }}：</span>
-            <span>{{ slot.dishNames.join(' / ') || '未設定品項' }}</span>
+            <div class="min-w-0 flex-1">
+              <span class="font-bold text-gray-900">{{ slot.name }}：</span>
+              <span class="text-gray-700">{{ slot.dishNames.join(' / ') || '無菜品' }}</span>
+            </div>
+            <button
+              type="button"
+              @click="editSlot(pkg, sIdx)"
+              class="shrink-0 text-xs sm:text-sm text-rose-700 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 border border-rose-300 px-2.5 py-1 rounded-lg font-bold transition-colors"
+            >
+              修改
+            </button>
           </div>
         </div>
       </div>

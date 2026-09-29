@@ -19,6 +19,7 @@ const STATIC_ASSETS = [
   './js/components/modals/DishModal.js',
   './js/components/modals/IngredientModal.js',
   './js/components/modals/PackageModal.js',
+  './js/components/modals/SlotQuickEditModal.js',
   './js/components/modals/SimpleBaseModal.js',
 ];
 

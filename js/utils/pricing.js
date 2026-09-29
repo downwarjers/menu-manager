@@ -1,4 +1,7 @@
 export const applyCustomRounding = (val, mode) => {
+  if (mode === 'none') {
+    return val;
+  }
   if (!mode || mode === 'round1') {
     return Math.round(val);
   }

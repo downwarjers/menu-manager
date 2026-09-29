@@ -70,7 +70,11 @@
 
       <!-- 標籤分頁內容 -->
       <dish-list v-if="currentTab === 'dishes'" @edit="openDishModal"></dish-list>
-      <package-list v-if="currentTab === 'packages'" @edit="openPackageModal"></package-list>
+      <package-list
+        v-if="currentTab === 'packages'"
+        @edit="openPackageModal"
+        @edit-slot="openSlotQuickEditModal"
+      ></package-list>
       <base-data-list
         v-if="currentTab === 'base'"
         @edit-ingredient="openIngredientModal"
@@ -89,6 +93,12 @@
         :pkg-data="editingPackage"
         @close="closeModal"
       ></package-modal>
+      <slot-quick-edit-modal
+        v-if="modalType === 'slotQuickEdit' && editingSlotContext"
+        :pkg="editingSlotContext.pkg"
+        :slot-index="editingSlotContext.slotIndex"
+        @close="closeModal"
+      ></slot-quick-edit-modal>
       <ingredient-modal
         v-if="modalType === 'ingredientForm'"
         :target-index="editingIngredientIndex"

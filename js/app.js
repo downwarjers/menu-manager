@@ -10,6 +10,7 @@ import BaseDataList from './components/BaseDataList.js';
 import ChannelModal from './components/modals/ChannelModal.js';
 import DishModal from './components/modals/DishModal.js';
 import PackageModal from './components/modals/PackageModal.js';
+import SlotQuickEditModal from './components/modals/SlotQuickEditModal.js';
 import IngredientModal from './components/modals/IngredientModal.js';
 import SimpleBaseModal from './components/modals/SimpleBaseModal.js';
 
@@ -22,6 +23,7 @@ createApp({
     ChannelModal,
     DishModal,
     PackageModal,
+    SlotQuickEditModal,
     IngredientModal,
     SimpleBaseModal,
   },
@@ -31,6 +33,7 @@ createApp({
 
     const editingDish = ref(null);
     const editingPackage = ref(null);
+    const editingSlotContext = ref(null);
     const editingIngredientIndex = ref(null);
     const editingSimpleIndex = ref(null);
 
@@ -59,6 +62,7 @@ createApp({
       modalType.value = null;
       editingDish.value = null;
       editingPackage.value = null;
+      editingSlotContext.value = null;
       editingIngredientIndex.value = null;
       editingSimpleIndex.value = null;
     };
@@ -71,6 +75,11 @@ createApp({
     const openPackageModal = (pkg = null) => {
       editingPackage.value = pkg;
       modalType.value = 'package';
+    };
+
+    const openSlotQuickEditModal = ({ pkg, slotIndex }) => {
+      editingSlotContext.value = { pkg, slotIndex };
+      modalType.value = 'slotQuickEdit';
     };
 
     const openIngredientModal = (idx = null) => {
@@ -94,12 +103,14 @@ createApp({
       backupWarning,
       editingDish,
       editingPackage,
+      editingSlotContext,
       editingIngredientIndex,
       editingSimpleIndex,
       openModal,
       closeModal,
       openDishModal,
       openPackageModal,
+      openSlotQuickEditModal,
       openIngredientModal,
       openSimpleBaseModal,
       triggerBackup,

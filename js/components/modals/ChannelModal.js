@@ -88,6 +88,7 @@ export default {
                   :disabled="ch.key === 'dine_in'"
                   class="border-2 border-gray-300 rounded-xl px-2 py-2 bg-white flex-1 min-w-0 text-sm sm:text-base outline-none"
                 >
+                  <option value="none">原始值</option>
                   <option value="round1">四捨五入 ($1)</option>
                   <option value="ceil5">進位 0 或 5 ($5)</option>
                   <option value="end9">尾數進位至 9 ($9)</option>
