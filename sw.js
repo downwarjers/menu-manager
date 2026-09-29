@@ -1,4 +1,4 @@
-const CACHE_NAME = 'menu-manager-v3';
+const CACHE_NAME = 'menu-manager-v4';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -26,7 +26,10 @@ const STATIC_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+      const freshRequests = STATIC_ASSETS.map((url) => {
+        return new Request(url, { cache: 'reload' });
+      });
+      return cache.addAll(freshRequests);
     }),
   );
   self.skipWaiting();
