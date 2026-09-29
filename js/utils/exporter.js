@@ -173,3 +173,58 @@ export const exportCSVFile = async (store) => {
     },
   ]);
 };
+
+export const shareBackupFile = async (store) => {
+  const nowIso = new Date().toISOString();
+  store.lastBackupTime = nowIso;
+  const dump = {
+    version: store.version,
+    exportedAt: nowIso,
+    channels: store.channels,
+    categories: store.categories,
+    ingredients: store.ingredients,
+    methods: store.methods,
+    dishes: store.dishes,
+    packages: store.packages,
+    lastBackupTime: nowIso,
+  };
+
+  const fileName = `菜單備份_${getTimestampString()}.json`;
+  const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+  const file = new File([blob], fileName, { type: 'application/json' });
+
+  // 1. 優先嘗試原生檔案分享 (手機 LINE / Email / 雲端硬碟)
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        title: '菜單資料備份',
+        text: `菜單備份檔案 (${nowIso})`,
+        files: [file],
+      });
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return;
+      } // 使用者中途取消分享，不報錯
+      console.warn('檔案分享失敗，嘗試文字分享:', err);
+    }
+  }
+
+  // 2. 次選方案：不支援檔案分享但支援純文字分享的裝置
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: '菜單資料備份',
+        text: JSON.stringify(dump),
+      });
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return;
+      }
+    }
+  }
+
+  // 3. 完全不支援 Web Share API 時（如部分傳統桌面瀏覽器），降級回原本的檔案下載
+  await exportJSONFile(store);
+};

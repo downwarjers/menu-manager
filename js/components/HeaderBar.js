@@ -1,7 +1,6 @@
 import { computed } from 'vue';
 import { store, applyDataset } from '../state/menuStore.js';
-import { exportCSVFile, exportJSONFile } from '../utils/exporter.js';
-
+import { exportCSVFile, exportJSONFile, shareBackupFile } from '../utils/exporter.js';
 export default {
   name: 'HeaderBar',
   emits: ['open-channels'],
@@ -23,6 +22,9 @@ export default {
     };
     const triggerJSON = () => {
       return exportJSONFile(store);
+    };
+    const triggerShare = () => {
+      return shareBackupFile(store);
     };
 
     const importJSON = (e) => {
@@ -52,6 +54,7 @@ export default {
       lastBackupText,
       triggerCSV,
       triggerJSON,
+      triggerShare,
       importJSON,
       openChannels: () => {
         return emit('open-channels');
@@ -70,7 +73,7 @@ export default {
         </button>
       </div>
       <div class="text-xs sm:text-sm text-gray-500 mb-3">上次完整備份：{{ lastBackupText }}</div>
-      <div class="grid grid-cols-3 gap-2">      
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">    
         <label
           class="bg-indigo-50 border border-indigo-200 text-indigo-700 active:bg-indigo-100 text-sm sm:text-base py-2.5 rounded-xl font-bold text-center cursor-pointer flex items-center justify-center shadow-sm"
         >
@@ -87,8 +90,15 @@ export default {
           @click="triggerCSV"
           class="bg-emerald-600 active:bg-emerald-700 text-white text-sm sm:text-base py-2.5 rounded-xl font-bold shadow-sm"
         >
-          匯出CSV
+          匯出表格
         </button>
+
+        <button
+          @click="triggerShare"
+          class="bg-amber-600 active:bg-amber-700 text-white text-sm sm:text-base py-2.5 rounded-xl font-bold shadow-sm flex items-center justify-center gap-1.5"
+         >
+           分享資料
+         </button>
       </div>
     </header>
   `,
