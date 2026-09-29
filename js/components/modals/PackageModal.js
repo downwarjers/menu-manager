@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { store } from '../../state/menuStore.js';
 import { calculateMarkupPrice } from '../../utils/pricing.js';
 
@@ -12,6 +12,8 @@ export default {
   },
   emits: ['close'],
   setup(props, { emit }) {
+    const scrollContainer = ref(null);
+
     const initPrices = (existingPrices = {}) => {
       const p = { ...existingPrices };
       store.channels.forEach((ch) => {
@@ -49,7 +51,7 @@ export default {
             prices: initPrices(),
             slots: [
               {
-                name: '菜1',
+                name: '菜項 1',
                 search: '',
                 filterCategory: '',
                 expanded: false,
@@ -69,15 +71,20 @@ export default {
       });
     };
 
-    const addPkgSlot = () => {
+    const addPkgSlot = async () => {
       pkgForm.value.slots.push({
-        name: `菜${pkgForm.value.slots.length + 1}`,
+        name: `菜項 ${pkgForm.value.slots.length + 1}`,
         search: '',
         filterCategory: '',
         expanded: false,
         dishNames: [],
         autoSort: true,
       });
+
+      await nextTick();
+      if (scrollContainer.value) {
+        scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+      }
     };
 
     const movePkgSlot = (idx, direction) => {
@@ -140,7 +147,7 @@ export default {
         return;
       }
       if (slot.dishNames.includes(name)) {
-        alert('此菜名已在該選項中！');
+        alert('該料理已存在於此插槽中');
         return;
       }
       slot.dishNames.push(name);
@@ -163,26 +170,25 @@ export default {
 
     const getVisibleDishes = (slot) => {
       const matched = getMatchedDishes(slot);
-      // 輸入關鍵字搜尋、選擇類別篩選，或點擊展開時才顯示菜品
       if (!slot || slot.search || slot.filterCategory || slot.expanded) {
         return matched;
       }
-      // 平常狀態完全不顯示菜品庫清單
       return [];
     };
 
     const savePackage = () => {
       const name = pkgForm.value.name.trim();
       if (!name) {
-        return alert('套餐名稱不得為空！');
+        return alert('請填寫套餐名稱');
       }
 
       const existingPkg = store.packages.find((p) => {
         return p.name === name && p.id !== pkgForm.value.id;
       });
+
       if (existingPkg) {
         const loadExisting = confirm(
-          `已存在同名套餐「${name}」！\n\n按「確定」：立即載入現有內容進行修改。\n按「取消」：更換名稱。`,
+          `已存在名稱為「${name}」的套餐。\n\n是否直接載入該套餐資料進行編輯？`,
         );
         if (loadExisting) {
           pkgForm.value = {
@@ -239,12 +245,14 @@ export default {
         store.packages.unshift({ ...payload });
         store.packages = [...store.packages];
       }
+
       emit('close');
     };
 
     return {
       store,
       pkgForm,
+      scrollContainer,
       applyAutoMarkup,
       addPkgSlot,
       movePkgSlot,
@@ -267,11 +275,11 @@ export default {
       <div class="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg shadow-2xl max-h-[92vh] flex flex-col overflow-hidden">
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-white shrink-0">
           <h3 class="text-lg sm:text-xl font-bold text-rose-600">
-            {{ pkgForm.id ? '修改套餐' : '組合多選套餐' }}
+            {{ pkgForm.id ? '編輯套餐' : '新增套餐' }}
           </h3>
-          <button @click="close" class="text-gray-400 hover:text-gray-700 text-3xl font-bold p-1 leading-none">✕</button>
+          <button @click="close" class="text-gray-400 hover:text-gray-700 text-3xl font-bold p-1 leading-none">&times;</button>
         </div>
-        <div class="p-5 overflow-y-auto space-y-3.5">
+        <div ref="scrollContainer" class="p-5 overflow-y-auto space-y-3.5">
           <div class="flex items-center gap-3 mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-200">
             <span class="text-sm font-bold text-gray-700">套餐狀態：</span>
             <button
@@ -279,10 +287,9 @@ export default {
               :class="pkgForm.active !== false ? 'bg-emerald-600 text-white' : 'bg-gray-400 text-white'"
               class="text-sm px-3.5 py-1.5 rounded-xl font-bold"
             >
-              {{ pkgForm.active !== false ? '✓ 供應中' : '✕ 已暫停售賣' }}
+              {{ pkgForm.active !== false ? '✓ 供應中' : '✕ 已停售' }}
             </button>
           </div>
-
           <label class="block text-sm font-bold text-gray-700 mb-1.5">套餐名稱：</label>
           <input
             v-model="pkgForm.name"
@@ -290,7 +297,6 @@ export default {
             placeholder="例如：超值雙人三菜一湯"
             class="w-full border-2 border-rose-300 rounded-xl p-3 text-base sm:text-lg font-bold mb-3.5 outline-none"
           />
-
           <div class="grid grid-cols-2 gap-2.5 mb-4">
             <div v-for="ch in store.channels" :key="ch.key">
               <label class="text-xs sm:text-sm text-gray-600 block mb-1 font-medium">{{ ch.name }}</label>
@@ -304,7 +310,6 @@ export default {
               />
             </div>
           </div>
-
           <div class="space-y-4 mb-6 border-t border-gray-200 pt-3">
             <div class="flex justify-between items-center">
               <span class="text-sm font-bold text-gray-700">配菜選項插槽：</span>
@@ -316,7 +321,6 @@ export default {
                 依槽名稱排序
               </button>
             </div>
-
             <div
               v-for="(slot, sIdx) in pkgForm.slots"
               :key="sIdx"
@@ -353,7 +357,6 @@ export default {
                   移除此槽
                 </button>
               </div>
-
               <div class="mb-3 bg-white p-3 rounded-xl border border-rose-200">
                 <div class="flex flex-wrap justify-between items-center gap-1.5 mb-1.5">
                   <div class="flex items-center gap-2">
@@ -373,7 +376,7 @@ export default {
                   </label>
                 </div>
                 <div v-if="slot.dishNames.length === 0" class="text-xs sm:text-sm text-gray-400 py-1">
-                  尚未勾選或輸入任何料理
+                  尚未加入料理
                 </div>
                 <div v-else class="flex flex-wrap gap-1.5">
                   <span
@@ -382,12 +385,11 @@ export default {
                     class="inline-flex items-center gap-1.5 text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200 px-2.5 py-1 rounded-lg font-medium"
                   >
                     {{ dishName }}
-                    <button @click="removeDishFromSlot(slot, dishName)" class="text-rose-400 hover:text-rose-700 text-base font-bold leading-none">✕</button>
+                    <button @click="removeDishFromSlot(slot, dishName)" class="text-rose-400 hover:text-rose-700 text-base font-bold leading-none">&times;</button>
                   </span>
                 </div>
               </div>
-
-              <!-- 兩欄合一：搜尋與加入限定品整合框 -->
+              <!-- 搜尋與加入限定品 -->
               <div class="flex flex-col sm:flex-row gap-2 mb-2">
                 <div class="flex flex-1 gap-2 min-w-0">
                   <input
@@ -412,8 +414,7 @@ export default {
                   <option v-for="c in store.categories" :key="c" :value="c">{{ c }}</option>
                 </select>
               </div>
-
-              <!-- 平常狀態完全不顯示菜品清單，僅在搜尋/分類篩選/展開時顯示 -->
+              <!-- 料理清單 -->
               <div
                 v-if="getVisibleDishes(slot).length > 0"
                 class="grid grid-cols-1 sm:grid-cols-2 gap-1.5"
@@ -432,12 +433,11 @@ export default {
                   />
                   <span class="truncate">
                     {{ d.name }}
-                    <span class="text-xs text-gray-400">({{ d.category || '未分' }})</span>
+                    <span class="text-xs text-gray-400">({{ d.category || '未分類' }})</span>
                   </span>
                 </label>
               </div>
-
-              <!-- 展開/收合按鈕：只要菜品庫有資料即可切換展開 -->
+              <!-- 展開全部按鈕 -->
               <div
                 v-if="!slot.search && !slot.filterCategory && getMatchedDishes(slot).length > 0"
                 class="mt-2.5 text-center"
@@ -453,7 +453,6 @@ export default {
             </div>
           </div>
         </div>
-
         <button
           type="button"
           @click="addPkgSlot"
@@ -461,10 +460,9 @@ export default {
         >
           <span class="text-lg leading-none">+</span> 增加菜項
         </button>
-
         <div class="p-4 border-t border-gray-200 bg-gray-50 flex gap-3 shrink-0">
           <button @click="close" class="flex-1 bg-gray-200 active:bg-gray-300 py-3 rounded-xl font-bold text-base text-gray-800">取消</button>
-          <button @click="savePackage" class="flex-1 bg-rose-600 active:bg-rose-700 text-white py-3 rounded-xl font-bold text-base">確認儲存</button>
+          <button @click="savePackage" class="flex-1 bg-rose-600 active:bg-rose-700 text-white py-3 rounded-xl font-bold text-base">儲存套餐</button>
         </div>
       </div>
     </div>
