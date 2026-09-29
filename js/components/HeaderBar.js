@@ -70,25 +70,25 @@ export default {
         </button>
       </div>
       <div class="text-xs sm:text-sm text-gray-500 mb-3">上次完整備份：{{ lastBackupText }}</div>
-      <div class="grid grid-cols-3 gap-2">
-        <button
-          @click="triggerCSV"
-          class="bg-emerald-600 active:bg-emerald-700 text-white text-sm sm:text-base py-2.5 rounded-xl font-bold shadow-sm"
+      <div class="grid grid-cols-3 gap-2">      
+        <label
+          class="bg-indigo-50 border border-indigo-200 text-indigo-700 active:bg-indigo-100 text-sm sm:text-base py-2.5 rounded-xl font-bold text-center cursor-pointer flex items-center justify-center shadow-sm"
         >
-          匯出菜單(CSV)
-        </button>
+          匯入資料
+          <input type="file" accept=".json" @change="importJSON" class="file-hidden" />
+        </label>
         <button
           @click="triggerJSON"
           class="bg-blue-600 active:bg-blue-700 text-white text-sm sm:text-base py-2.5 rounded-xl font-bold shadow-sm"
         >
-          完整備份
+          匯出資料
         </button>
-        <label
-          class="bg-indigo-50 border border-indigo-200 text-indigo-700 active:bg-indigo-100 text-sm sm:text-base py-2.5 rounded-xl font-bold text-center cursor-pointer flex items-center justify-center shadow-sm"
+        <button
+          @click="triggerCSV"
+          class="bg-emerald-600 active:bg-emerald-700 text-white text-sm sm:text-base py-2.5 rounded-xl font-bold shadow-sm"
         >
-          匯入備份
-          <input type="file" accept=".json" @change="importJSON" class="file-hidden" />
-        </label>
+          匯出CSV
+        </button>
       </div>
     </header>
   `,

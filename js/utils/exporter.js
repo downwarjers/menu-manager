@@ -26,7 +26,33 @@ const getTimestampString = () => {
   return `${parts.year}${parts.month}${parts.day}_${parts.hour}${parts.minute}${parts.second}`;
 };
 
-export const exportJSONFile = (store) => {
+const saveBlobFile = async (blob, suggestedName, pickerTypes = []) => {
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName,
+        types: pickerTypes,
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return;
+      }
+      console.warn('File System Access API 失敗，回退至傳統下載模式:', err);
+    }
+  }
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = suggestedName;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+export const exportJSONFile = async (store) => {
   const nowIso = new Date().toISOString();
   store.lastBackupTime = nowIso;
   const dump = {
@@ -41,21 +67,19 @@ export const exportJSONFile = (store) => {
     lastBackupTime: nowIso,
   };
   const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `菜單完整備份_${getTimestampString()}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  await saveBlobFile(blob, `菜單資料_${getTimestampString()}.json`, [
+    {
+      description: 'JSON Files',
+      accept: { 'application/json': ['.json'] },
+    },
+  ]);
 };
 
-export const exportCSVFile = (store) => {
-  const isConfirmed = confirm(
-    '即將匯出菜單 CSV。\n\n按「確定」：僅匯出【上架/供應中】品項\n按「取消」：取消並放棄匯出',
-  );
+export const exportCSVFile = async (store) => {
+  const isConfirmed = confirm('匯出 CSV 僅包含基本欄位資料，確認要匯出嗎？');
   if (!isConfirmed) {
     return;
   }
-
   const columns = [
     {
       header: '類型',
@@ -64,13 +88,13 @@ export const exportCSVFile = (store) => {
       },
     },
     {
-      header: '類別',
+      header: '分類',
       resolve: (item) => {
-        return item.__type === '單品料理' ? item.category || '' : '套餐';
+        return item.__type === '單點' ? item.category || '' : '-';
       },
     },
     {
-      header: '名稱',
+      header: '品名',
       resolve: (item) => {
         return item.name;
       },
@@ -84,9 +108,9 @@ export const exportCSVFile = (store) => {
       };
     }),
     {
-      header: '套餐內容明細',
+      header: '套餐內容',
       resolve: (item) => {
-        if (item.__type !== '套餐組合' || !item.slots) {
+        if (item.__type !== '套餐' || !item.slots) {
           return '';
         }
         return item.slots
@@ -97,24 +121,22 @@ export const exportCSVFile = (store) => {
       },
     },
   ];
-
   const targetDishes = store.dishes.filter((d) => {
     return d.active !== false;
   });
   const targetPkgs = store.packages.filter((p) => {
     return p.active !== false;
   });
-
   const rows = [
     ...targetDishes.map((d) => {
-      return { ...d, __type: '單品料理' };
+      return { ...d, __type: '單點' };
     }),
     ...targetPkgs.map((p) => {
-      return { ...p, __type: '套餐組合' };
+      return { ...p, __type: '套餐' };
     }),
   ].sort((a, b) => {
     if (a.__type !== b.__type) {
-      return a.__type === '單品料理' ? -1 : 1;
+      return a.__type === '單點' ? -1 : 1;
     }
     const catA = a.category || '';
     const catB = b.category || '';
@@ -122,17 +144,14 @@ export const exportCSVFile = (store) => {
     if (catCmp !== 0) {
       return catCmp;
     }
-
     const nameCmp = (a.name || '').localeCompare(b.name || '', 'zh-Hant');
     if (nameCmp !== 0) {
       return nameCmp;
     }
-
     const priceA = a.prices?.dine_in ?? 0;
     const priceB = b.prices?.dine_in ?? 0;
     return priceA - priceB;
   });
-
   const headerLine = columns
     .map((col) => {
       return escapeCSVField(col.header);
@@ -145,12 +164,12 @@ export const exportCSVFile = (store) => {
       })
       .join(',');
   });
-
   const csvContent = '\uFEFF' + [headerLine, ...dataLines].join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `菜單價目表_${getTimestampString()}.csv`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  await saveBlobFile(blob, `菜單列表_${getTimestampString()}.csv`, [
+    {
+      description: 'CSV Files',
+      accept: { 'text/csv': ['.csv'] },
+    },
+  ]);
 };

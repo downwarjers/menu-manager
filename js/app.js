@@ -39,9 +39,16 @@ createApp({
 
     onMounted(async () => {
       await initStore();
-      if ('serviceWorker' in navigator) {
+      // 僅在非本機環境 (localhost / 127.0.0.1) 下註冊 Service Worker
+      const isLocalhost = Boolean(
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.endsWith('.localhost'),
+      );
+
+      if ('serviceWorker' in navigator && !isLocalhost) {
         navigator.serviceWorker.register('./sw.js').catch((err) => {
-          console.error('ServiceWorker 註冊失敗:', err);
+          console.error('ServiceWorker error:', err);
         });
       }
     });
