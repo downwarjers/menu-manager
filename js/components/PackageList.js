@@ -30,11 +30,21 @@ export default {
       return list;
     });
 
+    const getValidSlots = (pkg) => {
+      if (!pkg || !Array.isArray(pkg.slots)) {
+        return [];
+      }
+      return pkg.slots.filter((s) => {
+        return Array.isArray(s.dishNames) && s.dishNames.length > 0;
+      });
+    };
+
     return {
       store,
       pkgSearch,
       pkgSort,
       filteredPackages,
+      getValidSlots,
       editPackage: (pkg) => {
         return emit('edit', pkg);
       },
@@ -122,8 +132,8 @@ export default {
 
         <div class="text-sm sm:text-base text-gray-700 space-y-2">
           <div
-            v-for="(slot, sIdx) in pkg.slots"
-            :key="sIdx"
++            v-for="(slot, sIdx) in getValidSlots(pkg)"
+              :key="sIdx"
             class="bg-gray-100 px-3 py-2 rounded-xl leading-relaxed"
           >
             <span class="font-bold text-gray-900">{{ slot.name }}：</span>

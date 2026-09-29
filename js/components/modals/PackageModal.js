@@ -209,18 +209,24 @@ export default {
         return;
       }
 
-      const payload = {
-        id: pkgForm.value.id || Date.now(),
-        name,
-        active: pkgForm.value.active !== false,
-        prices: { ...pkgForm.value.prices },
-        slots: pkgForm.value.slots.map((s) => {
+      const validSlots = pkgForm.value.slots
+        .filter((s) => {
+          return Array.isArray(s.dishNames) && s.dishNames.length > 0;
+        })
+        .map((s) => {
           return {
             name: s.name,
             autoSort: s.autoSort !== false,
             dishNames: [...s.dishNames],
           };
-        }),
+        });
+
+      const payload = {
+        id: pkgForm.value.id || Date.now(),
+        name,
+        active: pkgForm.value.active !== false,
+        prices: { ...pkgForm.value.prices },
+        slots: validSlots,
       };
 
       if (pkgForm.value.id) {
@@ -228,10 +234,12 @@ export default {
           return p.id === pkgForm.value.id;
         });
         if (idx !== -1) {
-          store.packages[idx] = payload;
+          store.packages[idx] = { ...payload };
+          store.packages = [...store.packages];
         }
       } else {
-        store.packages.unshift(payload);
+        store.packages.unshift({ ...payload });
+        store.packages = [...store.packages];
       }
       emit('close');
     };
