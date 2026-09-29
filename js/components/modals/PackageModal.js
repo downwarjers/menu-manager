@@ -36,7 +36,6 @@ export default {
                     search: '',
                     filterCategory: '',
                     expanded: false,
-                    customInput: '',
                     dishNames: Array.isArray(s.dishNames) ? [...s.dishNames] : [],
                     autoSort: s.autoSort !== false,
                   };
@@ -54,7 +53,6 @@ export default {
                 search: '',
                 filterCategory: '',
                 expanded: false,
-                customInput: '',
                 dishNames: [],
                 autoSort: true,
               },
@@ -77,7 +75,6 @@ export default {
         search: '',
         filterCategory: '',
         expanded: false,
-        customInput: '',
         dishNames: [],
         autoSort: true,
       });
@@ -138,7 +135,7 @@ export default {
       if (!slot) {
         return;
       }
-      const name = (slot.customInput || '').trim();
+      const name = (slot.search || '').trim();
       if (!name) {
         return;
       }
@@ -150,7 +147,7 @@ export default {
       if (slot.autoSort) {
         sortSlotDishNames(slot);
       }
-      slot.customInput = '';
+      slot.search = '';
     };
 
     const getMatchedDishes = (slot) => {
@@ -166,10 +163,12 @@ export default {
 
     const getVisibleDishes = (slot) => {
       const matched = getMatchedDishes(slot);
+      // 輸入關鍵字搜尋、選擇類別篩選，或點擊展開時才顯示菜品
       if (!slot || slot.search || slot.filterCategory || slot.expanded) {
         return matched;
       }
-      return matched.slice(0, 6);
+      // 平常狀態完全不顯示菜品庫清單
+      return [];
     };
 
     const savePackage = () => {
@@ -198,7 +197,6 @@ export default {
                     search: '',
                     filterCategory: '',
                     expanded: false,
-                    customInput: '',
                     dishNames: Array.isArray(s.dishNames) ? [...s.dishNames] : [],
                     autoSort: s.autoSort !== false,
                   };
@@ -389,39 +387,37 @@ export default {
                 </div>
               </div>
 
-              <div class="flex gap-2 mb-2.5">
-                <input
-                  v-model="slot.customInput"
-                  @keyup.enter="addCustomDishToSlot(slot)"
-                  type="text"
-                  placeholder="輸入套餐限定單品（免加菜品庫）..."
-                  class="flex-1 border-2 border-rose-200 text-sm sm:text-base px-3 py-2 rounded-xl bg-white outline-none focus:border-rose-500 min-w-0"
-                />
-                <button
-                  type="button"
-                  @click="addCustomDishToSlot(slot)"
-                  class="bg-rose-50 border border-rose-300 text-rose-700 active:bg-rose-100 font-bold px-3.5 py-2 rounded-xl text-sm shrink-0 shadow-sm"
-                >
-                  + 加入限定品
-                </button>
-              </div>
-
+              <!-- 兩欄合一：搜尋與加入限定品整合框 -->
               <div class="flex flex-col sm:flex-row gap-2 mb-2">
-                <input
-                  v-model="slot.search"
-                  placeholder="搜尋菜名..."
-                  class="flex-1 border text-sm sm:text-base px-3 py-2 rounded-xl bg-white outline-none min-w-0"
-                />
+                <div class="flex flex-1 gap-2 min-w-0">
+                  <input
+                    v-model="slot.search"
+                    @keyup.enter="addCustomDishToSlot(slot)"
+                    placeholder="搜尋菜名或輸入限定品..."
+                    class="flex-1 border text-sm sm:text-base px-3 py-2 rounded-xl bg-white outline-none focus:border-rose-400 min-w-0"
+                  />
+                  <button
+                    type="button"
+                    @click="addCustomDishToSlot(slot)"
+                    class="bg-rose-50 border border-rose-300 text-rose-700 active:bg-rose-100 font-bold px-3.5 py-2 rounded-xl text-sm shrink-0 shadow-sm whitespace-nowrap"
+                  >
+                    + 加入限定品
+                  </button>
+                </div>
                 <select
                   v-model="slot.filterCategory"
-                  class="border text-sm sm:text-base px-2 py-2 rounded-xl bg-white text-gray-700 outline-none"
+                  class="border text-sm sm:text-base px-2 py-2 rounded-xl bg-white text-gray-700 outline-none shrink-0"
                 >
                   <option value="">全部類別</option>
                   <option v-for="c in store.categories" :key="c" :value="c">{{ c }}</option>
                 </select>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              <!-- 平常狀態完全不顯示菜品清單，僅在搜尋/分類篩選/展開時顯示 -->
+              <div
+                v-if="getVisibleDishes(slot).length > 0"
+                class="grid grid-cols-1 sm:grid-cols-2 gap-1.5"
+              >
                 <label
                   v-for="d in getVisibleDishes(slot)"
                   :key="d.id"
@@ -441,15 +437,17 @@ export default {
                 </label>
               </div>
 
+              <!-- 展開/收合按鈕：只要菜品庫有資料即可切換展開 -->
               <div
-                v-if="!slot.search && !slot.filterCategory && getMatchedDishes(slot).length > 6"
+                v-if="!slot.search && !slot.filterCategory && getMatchedDishes(slot).length > 0"
                 class="mt-2.5 text-center"
               >
                 <button
+                  type="button"
                   @click="slot.expanded = !slot.expanded"
                   class="text-xs sm:text-sm text-indigo-600 font-bold bg-indigo-50 hover:bg-indigo-100 py-1.5 px-4 rounded-full border border-indigo-200"
                 >
-                  {{ slot.expanded ? '▲ 收合料理清單' : ('▼ 展開其餘 ' + (getMatchedDishes(slot).length - 6) + ' 道料理') }}
+                  {{ slot.expanded ? '▲ 收合料理清單' : ('▼ 展開料理清單 (共 ' + getMatchedDishes(slot).length + ' 道)') }}
                 </button>
               </div>
             </div>
