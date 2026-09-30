@@ -6,23 +6,11 @@ export default {
   name: 'HeaderBar',
   emits: ['open-channels'],
   setup(props, { emit }) {
-    const lastBackupText = computed(() => {
-      if (!store.lastBackupTime) {
-        return '無';
+    const formatDateTime = (isoString) => {
+      if (!isoString) {
+        return '';
       }
-      return new Date(store.lastBackupTime).toLocaleDateString('zh-TW', {
-        month: 'numeric',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    });
-
-    const exportedAtText = computed(() => {
-      if (!store.exportedAt) {
-        return '無';
-      }
-      return new Date(store.exportedAt).toLocaleDateString('zh-TW', {
+      return new Date(isoString).toLocaleDateString('zh-TW', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -30,6 +18,14 @@ export default {
         minute: '2-digit',
         hour12: false,
       });
+    };
+
+    const lastBackupText = computed(() => {
+      return formatDateTime(store.lastBackupTime);
+    });
+
+    const exportedAtText = computed(() => {
+      return formatDateTime(store.exportedAt);
     });
 
     const triggerCSV = () => {
