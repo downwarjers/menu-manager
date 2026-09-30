@@ -1,4 +1,4 @@
-import { createApp, ref, computed, onMounted } from 'vue';
+import { createApp, ref, onMounted } from 'vue';
 import { store, initStore } from './state/menuStore.js';
 import { exportJSONFile } from './utils/exporter.js';
 import HeaderBar from './components/HeaderBar.js';
@@ -70,14 +70,6 @@ createApp({
       }
     });
 
-    const backupWarning = computed(() => {
-      if (!store.lastBackupTime) {
-        return true;
-      }
-      const diffDays = (Date.now() - new Date(store.lastBackupTime).getTime()) / (1000 * 3600 * 24);
-      return diffDays >= 7;
-    });
-
     const openModal = (type) => {
       modalType.value = type;
     };
@@ -116,15 +108,10 @@ createApp({
       modalType.value = type;
     };
 
-    const triggerBackup = () => {
-      exportJSONFile(store);
-    };
-
     return {
       store,
       currentTab,
       modalType,
-      backupWarning,
       editingDish,
       editingPackage,
       editingSlotContext,
@@ -137,7 +124,6 @@ createApp({
       openSlotQuickEditModal,
       openIngredientModal,
       openSimpleBaseModal,
-      triggerBackup,
     };
   },
 }).mount('#app');
