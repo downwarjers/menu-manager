@@ -8,7 +8,7 @@ export default {
   setup(props, { emit }) {
     const lastBackupText = computed(() => {
       if (!store.lastBackupTime) {
-        return '從未手動備份';
+        return '無';
       }
       return new Date(store.lastBackupTime).toLocaleDateString('zh-TW', {
         month: 'numeric',
@@ -18,9 +18,24 @@ export default {
       });
     });
 
+    const exportedAtText = computed(() => {
+      if (!store.exportedAt) {
+        return '無';
+      }
+      return new Date(store.exportedAt).toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    });
+
     const triggerCSV = () => {
       return exportCSVFile(store);
     };
+
     const triggerJSON = () => {
       return exportJSONFile(store);
     };
@@ -30,17 +45,16 @@ export default {
       if (!file) {
         return;
       }
-
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
           const data = JSON.parse(event.target.result);
-          if (confirm('匯入將會完整覆寫現有菜單與通路資料，確定繼續？')) {
+          if (confirm('確定要載入此備份資料嗎？現有資料將會被覆蓋。')) {
             applyDataset(data);
-            alert('資料匯入完成！');
+            alert('資料匯入成功！');
           }
         } catch (err) {
-          alert('JSON 格式錯誤，無法解析！');
+          alert('JSON 解析失敗，請確認檔案格式是否正確。');
         }
       };
       reader.readAsText(file);
@@ -50,6 +64,7 @@ export default {
     return {
       store,
       lastBackupText,
+      exportedAtText,
       triggerCSV,
       triggerJSON,
       importJSON,
@@ -61,7 +76,7 @@ export default {
   template: `
     <header class="bg-white p-4 rounded-2xl shadow-sm mb-4 border border-gray-200">
       <div class="flex justify-between items-center mb-2">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">菜單品項與通路定價</h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">菜單管理系統</h1>
         <button
           @click="openChannels"
           class="text-sm bg-gray-100 active:bg-gray-200 text-gray-700 px-3 py-2 rounded-xl border font-bold"
@@ -69,8 +84,11 @@ export default {
           ⚙ 通路與加成
         </button>
       </div>
-      <div class="text-xs sm:text-sm text-gray-500 mb-3">上次完整備份：{{ lastBackupText }}</div>
-      <div class="grid grid-cols-3 gap-2">      
+      <div class="flex flex-wrap justify-between text-xs sm:text-sm text-gray-500 mb-3 gap-1">
+        <span>資料版本日期: {{ exportedAtText }}</span>
+        <span>上次匯出時間: {{ lastBackupText }}</span>
+      </div>
+      <div class="grid grid-cols-3 gap-2">
         <label
           class="bg-indigo-50 border border-indigo-200 text-indigo-700 active:bg-indigo-100 text-sm sm:text-base py-2.5 rounded-xl font-bold text-center cursor-pointer flex items-center justify-center shadow-sm"
         >

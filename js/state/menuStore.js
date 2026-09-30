@@ -5,6 +5,7 @@ const STORAGE_KEY = 'restaurant_menu_master';
 
 export const store = reactive({
   version: 'initial',
+  exportedAt: null,
   channels: [],
   categories: [],
   ingredients: [],
@@ -27,6 +28,9 @@ const ensureItemPrices = (itemPrices, channels) => {
 };
 
 export const applyDataset = (data) => {
+  if (data.exportedAt) {
+    store.exportedAt = data.exportedAt;
+  }
   if (Array.isArray(data.channels)) {
     store.channels = data.channels;
   }
@@ -80,7 +84,7 @@ export const initStore = async () => {
       remoteData = await res.json();
     }
   } catch (err) {
-    console.warn('無法連線取得 ./data/latest.json，切換至離線/本地模式', err);
+    console.warn('載入 ./data/latest.json 失敗', err);
   }
 
   const rawLocal = localStorage.getItem(STORAGE_KEY);
@@ -89,22 +93,19 @@ export const initStore = async () => {
     try {
       localData = JSON.parse(rawLocal);
     } catch (e) {
-      console.error('LocalStorage 資料解析失敗', e);
+      console.error('LocalStorage 解析失敗', e);
     }
   }
 
   if (remoteData) {
-    // 若本地無資料，或遠端 JSON 版本不同，直接以遠端最新 JSON 強制覆蓋本地
     if (!localData || localData.version !== remoteData.version) {
       store.version = remoteData.version || 'unknown';
       applyDataset(remoteData);
     } else {
-      // 版本相同：優先採用本地 LocalStorage 的暫存狀態
       store.version = localData.version;
       applyDataset(localData);
     }
   } else if (localData) {
-    // 斷網或讀不到遠端 JSON 時的降級處理
     store.version = localData.version || 'offline';
     applyDataset(localData);
   }
@@ -116,6 +117,7 @@ export const initStore = async () => {
     () => {
       const payload = {
         version: store.version,
+        exportedAt: store.exportedAt,
         channels: store.channels,
         categories: store.categories,
         ingredients: store.ingredients,
@@ -142,6 +144,7 @@ export const recalculateAllMarkup = () => {
       }
     });
   });
+
   store.packages.forEach((pkg) => {
     if (!pkg.prices) {
       pkg.prices = {};
@@ -210,7 +213,7 @@ export const deleteStoreItem = (type, id) => {
     const targetPkg = store.packages.find((p) => {
       return p.id === id;
     });
-    if (!confirm(`確定要刪除套餐「${targetPkg?.name || ''}」嗎？`)) {
+    if (!confirm(`確定要刪除「${targetPkg?.name || ''}」嗎？`)) {
       return;
     }
     store.packages = store.packages.filter((p) => {

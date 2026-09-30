@@ -24,20 +24,6 @@
   </head>
   <body class="bg-gray-100 text-gray-800 font-sans pb-32">
     <div id="app" class="max-w-xl mx-auto min-h-screen p-3 sm:p-5">
-      <!-- 備份過期安全警示橫條 -->
-      <div
-        v-if="backupWarning"
-        class="bg-amber-100 border border-amber-300 text-amber-900 px-4 py-3 rounded-2xl mb-3 text-sm sm:text-base flex flex-col sm:flex-row justify-between items-center gap-2 font-bold shadow-sm"
-      >
-        <span class="text-center sm:text-left">⚠️ 已超過 7 天未備份！建議點擊備份防遺失</span>
-        <button
-          @click="triggerBackup"
-          class="w-full sm:w-auto bg-amber-600 active:bg-amber-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm"
-        >
-          立刻備份
-        </button>
-      </div>
-
       <!-- 頂部列：資料維護中樞 -->
       <header-bar @open-channels="openModal('channelConfig')"></header-bar>
 
