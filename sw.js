@@ -1,4 +1,4 @@
-const CACHE_NAME = 'menu-manager-v4';
+const CACHE_NAME = 'menu-manager-v5';
 const STATIC_ASSETS = [
   './',
   './index.html',
