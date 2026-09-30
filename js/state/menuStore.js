@@ -1,11 +1,10 @@
 import { reactive, watch } from 'vue';
 import { calculateMarkupPrice } from '../utils/pricing.js';
 
-const CURRENT_DATA_VERSION = '2026.09.26';
 const STORAGE_KEY = 'restaurant_menu_master';
 
 export const store = reactive({
-  version: CURRENT_DATA_VERSION,
+  version: 'initial',
   channels: [],
   categories: [],
   ingredients: [],
@@ -74,28 +73,40 @@ export const applyDataset = (data) => {
 };
 
 export const initStore = async () => {
-  let loadedFromJSON = false;
+  let remoteData = null;
   try {
     const res = await fetch('./data/latest.json', { cache: 'no-cache' });
     if (res.ok) {
-      const jsonData = await res.json();
-      applyDataset(jsonData);
-      loadedFromJSON = true;
+      remoteData = await res.json();
     }
   } catch (err) {
-    console.warn('未載入 ./data/latest.json，改用本地快取。');
+    console.warn('無法連線取得 ./data/latest.json，切換至離線/本地模式', err);
   }
 
-  if (!loadedFromJSON) {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        const localData = JSON.parse(raw);
-        applyDataset(localData);
-      } catch (e) {
-        console.error('LocalStorage 讀取異常：', e);
-      }
+  const rawLocal = localStorage.getItem(STORAGE_KEY);
+  let localData = null;
+  if (rawLocal) {
+    try {
+      localData = JSON.parse(rawLocal);
+    } catch (e) {
+      console.error('LocalStorage 資料解析失敗', e);
     }
+  }
+
+  if (remoteData) {
+    // 若本地無資料，或遠端 JSON 版本不同，直接以遠端最新 JSON 強制覆蓋本地
+    if (!localData || localData.version !== remoteData.version) {
+      store.version = remoteData.version || 'unknown';
+      applyDataset(remoteData);
+    } else {
+      // 版本相同：優先採用本地 LocalStorage 的暫存狀態
+      store.version = localData.version;
+      applyDataset(localData);
+    }
+  } else if (localData) {
+    // 斷網或讀不到遠端 JSON 時的降級處理
+    store.version = localData.version || 'offline';
+    applyDataset(localData);
   }
 
   watch(
@@ -104,7 +115,7 @@ export const initStore = async () => {
     },
     () => {
       const payload = {
-        version: CURRENT_DATA_VERSION,
+        version: store.version,
         channels: store.channels,
         categories: store.categories,
         ingredients: store.ingredients,
@@ -131,7 +142,6 @@ export const recalculateAllMarkup = () => {
       }
     });
   });
-
   store.packages.forEach((pkg) => {
     if (!pkg.prices) {
       pkg.prices = {};
@@ -153,7 +163,6 @@ export const deleteStoreItem = (type, id) => {
     if (!targetDish) {
       return;
     }
-
     const dishName = targetDish.name;
     const usedInPackages = store.packages.filter((p) => {
       return p.slots?.some((s) => {
@@ -169,13 +178,13 @@ export const deleteStoreItem = (type, id) => {
         .slice(0, 3)
         .join('、');
       const proceed = confirm(
-        `【警告】此料理已引用於以下套餐：\n${pkgNames}${usedInPackages.length > 3 ? ' 等' : ''}\n\n確定刪除將同步自所有套餐中移除此菜名，是否確定？`,
+        `此品項正被以下套餐使用中：\n${pkgNames}${usedInPackages.length > 3 ? '...' : ''}\n\n確定仍要刪除嗎？`,
       );
       if (!proceed) {
         return;
       }
     } else {
-      if (!confirm(`確定要刪除料理「${dishName}」嗎？`)) {
+      if (!confirm(`確定要刪除「${dishName}」嗎？`)) {
         return;
       }
     }

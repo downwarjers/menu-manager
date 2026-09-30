@@ -1,18 +1,19 @@
 import { createApp, ref, computed, onMounted } from 'vue';
 import { store, initStore } from './state/menuStore.js';
 import { exportJSONFile } from './utils/exporter.js';
-
 import HeaderBar from './components/HeaderBar.js';
 import DishList from './components/DishList.js';
 import PackageList from './components/PackageList.js';
 import BaseDataList from './components/BaseDataList.js';
-
 import ChannelModal from './components/modals/ChannelModal.js';
 import DishModal from './components/modals/DishModal.js';
 import PackageModal from './components/modals/PackageModal.js';
 import SlotQuickEditModal from './components/modals/SlotQuickEditModal.js';
 import IngredientModal from './components/modals/IngredientModal.js';
 import SimpleBaseModal from './components/modals/SimpleBaseModal.js';
+
+// PWA 離線快取開關：true = 啟用 Service Worker 快取；false = 停用並主動清理現有快取
+const ENABLE_PWA_CACHE = false;
 
 createApp({
   components: {
@@ -30,7 +31,6 @@ createApp({
   setup() {
     const currentTab = ref('dishes');
     const modalType = ref(null);
-
     const editingDish = ref(null);
     const editingPackage = ref(null);
     const editingSlotContext = ref(null);
@@ -39,17 +39,34 @@ createApp({
 
     onMounted(async () => {
       await initStore();
-      // 僅在非本機環境 (localhost / 127.0.0.1) 下註冊 Service Worker
-      const isLocalhost = Boolean(
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1' ||
-        window.location.hostname.endsWith('.localhost'),
-      );
 
-      if ('serviceWorker' in navigator && !isLocalhost) {
-        navigator.serviceWorker.register('./sw.js').catch((err) => {
-          console.error('ServiceWorker error:', err);
-        });
+      if ('serviceWorker' in navigator) {
+        const isLocalhost = Boolean(
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1' ||
+          window.location.hostname.endsWith('.localhost'),
+        );
+
+        if (ENABLE_PWA_CACHE && !isLocalhost) {
+          // 啟用模式：註冊 Service Worker
+          navigator.serviceWorker.register('./sw.js').catch((err) => {
+            console.error('ServiceWorker registration error:', err);
+          });
+        } else {
+          // 關閉模式：主動清除所有已安裝的 Service Worker 與 Cache Storage
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const registration of registrations) {
+              registration.unregister();
+            }
+          });
+          if ('caches' in window) {
+            caches.keys().then((keys) => {
+              keys.forEach((key) => {
+                return caches.delete(key);
+              });
+            });
+          }
+        }
       }
     });
 

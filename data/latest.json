@@ -1,6 +1,6 @@
 {
-  "version": "2026.09.26",
-  "exportedAt": "2026-09-29T15:20:39.046Z",
+  "version": "2026.09.30",
+  "exportedAt": "2026-09-30T11:47:33.994Z",
   "channels": [
     {
       "key": "dine_in",
@@ -225,6 +225,38 @@
   ],
   "dishes": [
     {
+      "id": 1790768686129,
+      "name": "烤秋刀魚（2隻）",
+      "active": true,
+      "mode": "combine",
+      "category": "烤物",
+      "method": "",
+      "ingredients": [],
+      "prices": {
+        "dine_in": 150,
+        "pos": 150,
+        "panda": 199,
+        "ch_1790273628034": 199
+      }
+    },
+    {
+      "id": 1790767331340,
+      "name": "黑胡椒豆腐",
+      "active": true,
+      "mode": "combine",
+      "category": "熱炒",
+      "method": "黑胡椒",
+      "ingredients": [
+        "豆腐"
+      ],
+      "prices": {
+        "dine_in": 190,
+        "pos": 190,
+        "panda": 249,
+        "ch_1790273628034": 249
+      }
+    },
+    {
       "id": 1790690130108,
       "name": "豆豉鮮蚵",
       "active": true,
@@ -236,10 +268,10 @@
         "鮮蚵"
       ],
       "prices": {
-        "dine_in": 200,
-        "pos": 200,
-        "panda": 269,
-        "ch_1790273628034": 269
+        "dine_in": 220,
+        "pos": 220,
+        "panda": 289,
+        "ch_1790273628034": 289
       }
     },
     {
@@ -254,10 +286,10 @@
         "蝦球"
       ],
       "prices": {
-        "dine_in": 280,
-        "pos": 280,
-        "panda": 369,
-        "ch_1790273628034": 369
+        "dine_in": 300,
+        "pos": 300,
+        "panda": 399,
+        "ch_1790273628034": 399
       }
     },
     {
@@ -767,34 +799,34 @@
     {
       "id": 27,
       "name": "黑胡椒松阪豬",
+      "active": true,
       "mode": "combine",
       "category": "熱炒",
       "method": "黑胡椒",
       "ingredients": [
         "松阪豬"
       ],
-      "active": true,
       "prices": {
-        "dine_in": 250,
-        "pos": 250,
+        "dine_in": 260,
+        "pos": 260,
         "uber": 315,
-        "panda": 329,
-        "ch_1790273628034": 329
+        "panda": 339,
+        "ch_1790273628034": 339
       }
     },
     {
       "id": 28,
       "name": "黑胡椒牛小排",
+      "active": true,
       "mode": "combine",
       "category": "熱炒",
       "method": "黑胡椒",
       "ingredients": [
         "牛小排"
       ],
-      "active": true,
       "prices": {
-        "dine_in": 285,
-        "pos": 285,
+        "dine_in": 290,
+        "pos": 290,
         "uber": 360,
         "panda": 379,
         "ch_1790273628034": 379
@@ -803,37 +835,37 @@
     {
       "id": 29,
       "name": "黑胡椒蝦球",
+      "active": true,
       "mode": "combine",
       "category": "熱炒",
       "method": "黑胡椒",
       "ingredients": [
         "蝦球"
       ],
-      "active": true,
       "prices": {
-        "dine_in": 285,
-        "pos": 285,
+        "dine_in": 295,
+        "pos": 295,
         "uber": 360,
-        "panda": 379,
-        "ch_1790273628034": 379
+        "panda": 389,
+        "ch_1790273628034": 389
       }
     },
     {
       "id": 30,
       "name": "黑胡椒雞丁",
+      "active": true,
       "mode": "combine",
       "category": "熱炒",
       "method": "黑胡椒",
       "ingredients": [
         "雞丁"
       ],
-      "active": true,
       "prices": {
-        "dine_in": 200,
-        "pos": 200,
+        "dine_in": 210,
+        "pos": 210,
         "uber": 250,
-        "panda": 269,
-        "ch_1790273628034": 269
+        "panda": 279,
+        "ch_1790273628034": 279
       }
     },
     {
@@ -847,29 +879,29 @@
         "中卷"
       ],
       "prices": {
-        "dine_in": 250,
-        "pos": 250,
+        "dine_in": 260,
+        "pos": 260,
         "uber": 315,
-        "panda": 329,
-        "ch_1790273628034": 329
+        "panda": 339,
+        "ch_1790273628034": 339
       }
     },
     {
       "id": 32,
       "name": "黑胡椒排骨",
+      "active": true,
       "mode": "combine",
       "category": "熱炒",
       "method": "黑胡椒",
       "ingredients": [
         "排骨"
       ],
-      "active": true,
       "prices": {
-        "dine_in": 250,
-        "pos": 250,
+        "dine_in": 260,
+        "pos": 260,
         "uber": 315,
-        "panda": 329,
-        "ch_1790273628034": 329
+        "panda": 339,
+        "ch_1790273628034": 339
       }
     },
     {
@@ -1320,11 +1352,11 @@
         "蝦球"
       ],
       "prices": {
-        "dine_in": 250,
-        "pos": 250,
+        "dine_in": 260,
+        "pos": 260,
         "uber": 315,
-        "panda": 329,
-        "ch_1790273628034": 329
+        "panda": 339,
+        "ch_1790273628034": 339
       }
     },
     {
@@ -1915,11 +1947,11 @@
         "鹹蛋"
       ],
       "prices": {
-        "dine_in": 190,
-        "pos": 190,
+        "dine_in": 200,
+        "pos": 200,
         "uber": 240,
-        "panda": 249,
-        "ch_1790273628034": 249
+        "panda": 269,
+        "ch_1790273628034": 269
       }
     },
     {
@@ -2018,19 +2050,19 @@
     {
       "id": 96,
       "name": "鹽烤胡椒魚",
+      "active": true,
       "mode": "combine",
       "category": "烤物",
       "method": "鹽烤",
       "ingredients": [
         "鮮魚"
       ],
-      "active": true,
       "prices": {
-        "dine_in": 330,
-        "pos": 330,
+        "dine_in": 350,
+        "pos": 350,
         "uber": 415,
-        "panda": 429,
-        "ch_1790273628034": 429
+        "panda": 459,
+        "ch_1790273628034": 459
       }
     },
     {
@@ -2803,7 +2835,7 @@
     },
     {
       "id": 139,
-      "name": "藥膳人蔘雞湯",
+      "name": "藥膳雞湯",
       "active": true,
       "mode": "combine",
       "category": "湯品",
@@ -3186,7 +3218,7 @@
             "剝皮辣椒雞湯",
             "麻香猴頭菇鮮雞湯",
             "鳳梨苦瓜雞湯",
-            "藥膳人蔘雞湯",
+            "藥膳雞湯",
             "鱸魚蛤蠣湯"
           ]
         }
@@ -3220,8 +3252,11 @@
           "autoSort": true,
           "dishNames": [
             "川味豆腐",
+            "金沙豆腐",
             "紅燒豆腐",
-            "塔香豆腐"
+            "塔香豆腐",
+            "蒜蓉豆腐",
+            "糖醋豆腐"
           ]
         },
         {
@@ -3297,7 +3332,7 @@
             "剝皮辣椒雞湯",
             "麻香猴頭菇鮮雞湯",
             "鳳梨苦瓜雞湯",
-            "藥膳人蔘雞湯",
+            "藥膳雞湯",
             "鱸魚蛤蠣湯"
           ]
         }
@@ -3509,6 +3544,7 @@
           "dishNames": [
             "川味豆腐",
             "塔香豆腐",
+            "蒜蓉豆腐",
             "糖醋豆腐"
           ]
         },
@@ -3580,6 +3616,7 @@
           "name": "菜4",
           "autoSort": true,
           "dishNames": [
+            "九層塔蛋",
             "菜脯蛋",
             "蔥蛋"
           ]
@@ -3597,5 +3634,5 @@
       ]
     }
   ],
-  "lastBackupTime": "2026-09-29T15:20:39.046Z"
+  "lastBackupTime": "2026-09-30T11:47:33.994Z"
 }

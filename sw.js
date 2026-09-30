@@ -1,4 +1,4 @@
-const CACHE_NAME = 'menu-manager-v5';
+const CACHE_NAME = 'menu-manager-v-auto';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -55,7 +55,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 針對最新資料採用 Network-First
+  // 1. latest.json 走 Network-First（有網路就抓最新，斷網才讀快取）
   if (event.request.url.includes('/data/latest.json')) {
     event.respondWith(
       fetch(event.request)
@@ -73,22 +73,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 其餘資源採用 Cache-First, 失敗則回退網路並寫入快取
+  // 2. 其他靜態資源走 Stale-While-Revalidate（有快取先顯示，背景自動下載最新版替換）
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return (
-        cached ||
-        fetch(event.request).then((res) => {
-          if (!res || res.status !== 200 || res.type === 'opaque') {
-            return res;
+      const networkFetch = fetch(event.request)
+        .then((res) => {
+          if (res && res.status === 200 && res.type !== 'opaque') {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              return cache.put(event.request, clone);
+            });
           }
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            return cache.put(event.request, clone);
-          });
           return res;
         })
-      );
+        .catch(() => {
+          return cached;
+        });
+
+      return cached || networkFetch;
     }),
   );
 });
